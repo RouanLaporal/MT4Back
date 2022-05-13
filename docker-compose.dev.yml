@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  vscode:
+    build: 
+      context: ./
+      dockerfile: ./Dockerfile.dev
+    command: /bin/bash -c "while sleep 1000; do :; done"
+    container_name: api_vscode
+    working_dir: /server
+    networks:
+      - app-network
+    volumes:
+      # Nous allons préciser le dossier local
+      - .:/server:cached
+
+  dbms:
+    image: mariadb
+    restart: always
+    ports:
+      - "3309:3306"
+    env_file: 
+      - ./dbms/.env
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci",
+    ]
+    volumes:
+      - ./dbms/dbms-data:/var/lib/mysql
+      - ./dbms/mariadb.cnf:/etc/mysql/mariadb.cnf
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

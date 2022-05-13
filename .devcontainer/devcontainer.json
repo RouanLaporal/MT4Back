@@ -1,0 +1,21 @@
+{
+  "name": "NodeJS Boilerplate API",
+  // Pointer vers notre docker-compose.dev.yml
+  "dockerComposeFile": [
+    "../docker-compose.dev.yml",
+  ],
+  // Le service dans docker-compose.dev.yml auquel on va attacher VSCode
+  "service": "vscode",
+  // Le dossier de travail précisé dans Dockerfile.dev
+  "workspaceFolder": "/server",
+  // Set *default* container specific settings.json values on container create.
+  "settings": {},
+  // Quelques extensions VSCode à inclure par défaut pour notre projet
+  "extensions": [
+    "pmneo.tsimporter",
+    "stringham.move-ts",
+    "rbbit.typescript-hero",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "streetsidesoftware.code-spell-checker-french"
+  ]
+}

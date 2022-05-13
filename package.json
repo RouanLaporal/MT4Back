@@ -1,26 +1,22 @@
 {
-  "name": "server",
+  "name": "boilerplate-api",
   "version": "1.0.0",
-  "description": "Mon premier serveur avec nodejs",
+  "description": "Boilerplate api project with nodejs",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "hello": "nodemon ./src/hello.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "ts-example": "nodemon --watch 'src' src/typescript/my-first-typescript.ts",
-    "server-simple": "nodemon --watch 'src' src/express/server-simple.ts",
-    "demo-refactored": "nodemon --watch 'src' src/express/demo-routing-2.ts",
-    "demo-mysql": "nodemon --watch 'src' src/mysql/demo-mysql.ts"
+    "api": "nodemon --watch 'src' src/api.ts -L"
   },
   "repository": {
     "type": "git",
-    "url": "git@dev.glassworks.tech:hetic-mt1-p2023/backend/nodejs-api-server.git"
+    "url": "git@dev.glassworks.tech:hetic-mt1-p2023/backend/nodejs-boilerplate-api.git"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ajv": "^8.11.0",
     "body-parser": "^1.20.0",
     "express": "~4.18",
     "mysql2": "^2.3.3"

@@ -51,46 +51,44 @@ export const CrudRouter = <RecordStructure, CreateStructure, UpdateStructure>(op
   const crud = Router({ mergeParams: true });
 
   // Operations sans identifiant  
-  if (options.operations < 4) {
-    const routerIndex = Router({ mergeParams: true });
-    
-    // Index: GET /
-    if ((options.operations & CrudOperations.Index) > 0) {
-      routerIndex.get<{}, IIndexResponse<RecordStructure>, {}, IIndexQuery>('/',
-        async (request, response, next: NextFunction) => {
+  const routerIndex = Router({ mergeParams: true });
+  
+  // Index: GET /
+  if ((options.operations & CrudOperations.Index) > 0) {
+    routerIndex.get<{}, IIndexResponse<RecordStructure>, {}, IIndexQuery>('/',
+      async (request, response, next: NextFunction) => {
 
-          try {      
-            
-            const result = await Crud.Index<RecordStructure>(request.query, options.table, options.readColumns || ['*']);      
-            response.json(result);
+        try {      
+          
+          const result = await Crud.Index<RecordStructure>(request.query, options.table, options.readColumns || ['*']);      
+          response.json(result);
 
-          } catch (err: any) {
-            next(err);
-          }
-
+        } catch (err: any) {
+          next(err);
         }
-      );
-    }
 
-    // Create: POST /
-    if ((options.operations & CrudOperations.Create) > 0) {
-      routerIndex.post<{}, ICreateResponse, CreateStructure>('/',
-        async (request, response, next: NextFunction) => {
-
-          try {
-            const result = await Crud.Create<CreateStructure>(request.body, options.table, options.validators?.create);
-            response.json(result);
-
-          } catch (err: any) {
-            next(err);
-          }
-
-        }
-      );
-    }
-
-    crud.use(routerIndex);
+      }
+    );
   }
+
+  // Create: POST /
+  if ((options.operations & CrudOperations.Create) > 0) {
+    routerIndex.post<{}, ICreateResponse, CreateStructure>('/',
+      async (request, response, next: NextFunction) => {
+
+        try {
+          const result = await Crud.Create<CreateStructure>(request.body, options.table, options.validators?.create);
+          response.json(result);
+
+        } catch (err: any) {
+          next(err);
+        }
+
+      }
+    );
+  }
+
+  crud.use(routerIndex);  
 
   // Operation sur une ligne précise, identifié par :recordId
   if (options.operations >= 4) {

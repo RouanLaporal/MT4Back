@@ -3,12 +3,14 @@ import { OkPacket, RowDataPacket } from 'mysql2';
 import { ICreateResponse } from '../types/api/ICreateResponse';
 import { IIndexQuery, IIndexResponse } from '../types/api/IIndexQuery';
 import { ITableCount } from '../types/api/ITableCount';
+import { IUpdateResponse } from '../types/api/IUpdateResponse';
 import { DbTable } from '../types/tables/tables';
 import { DB } from './DB';
 import { ApiError } from './Errors/ApiError';
 import { ErrorCode } from './Errors/ErrorCode';
-import { IUpdateResponse } from '../types/api/IUpdateResponse';
-import mysql from 'mysql2';
+
+
+
 
 /**
  * Class qui fournit des fonctions utilitaires pour les opérations ICRUD.
@@ -52,8 +54,8 @@ export class Crud {
     return res;
   }
 
-  public static async Create<T>(body: T, table: DbTable, validator: ValidateFunction<T>): Promise<ICreateResponse> {
-    if (validator(body)) {
+  public static async Create<T>(body: T, table: DbTable, validator?: ValidateFunction<T>): Promise<ICreateResponse> {
+    if (!validator || validator(body)) {
       const db = DB.Connection;
       const data = await db.query<OkPacket>(`insert into ${table} set ?`, body);
 
@@ -65,8 +67,8 @@ export class Crud {
     }
   }
 
-  public static async Update<T>(body: T, table: DbTable, idName: string, idValue: number, validator: ValidateFunction<T>): Promise<IUpdateResponse> {
-    if (validator(body)) {
+  public static async Update<T>(body: T, table: DbTable, idName: string, idValue: number, validator?: ValidateFunction<T>): Promise<IUpdateResponse> {
+    if (!validator || validator(body)) {
       const db = DB.Connection;
 
       const data = await db.query<OkPacket>(`update ${table} set ? where ${idName} = ?`, [body, idValue]);

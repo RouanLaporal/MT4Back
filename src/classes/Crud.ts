@@ -1,7 +1,7 @@
 import { ValidateFunction } from 'ajv';
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { ICreateResponse } from '../types/api/ICreateResponse';
-import { IIndexQuery, IIndexResponse } from '../types/api/IIndexQuery';
+import { IIndexQuery, IIndexResponse, IReadWhere } from '../types/api/IIndexQuery';
 import { ITableCount } from '../types/api/ITableCount';
 import { IUpdateResponse } from '../types/api/IUpdateResponse';
 import { DbTable } from '../types/tables/tables';
@@ -27,7 +27,7 @@ export class Crud {
    * @returns IIndexResponse contenant les résultats de la recherche.   
    * @todo Ajouter la possibilité de préciser les colonnes dans la requête ?
    */
-  public static async Index<T>(query: IIndexQuery, table: DbTable, columns: string[]) : Promise<IIndexResponse<T>> {
+  public static async Index<T>(query: IIndexQuery, table: DbTable, columns: string[], where?: IReadWhere) : Promise<IIndexResponse<T>> {
 
     const db = DB.Connection;      
     // On suppose que le params query sont en format string, et potentiellement
@@ -41,7 +41,9 @@ export class Crud {
     const count = await db.query<ITableCount[] & RowDataPacket[]>(`select count(*) as total from ${table}`);      
 
     // Récupérer les lignes
-    const data = await db.query<T[] & RowDataPacket[]>(`select ${columns.join(',')} from ${table} limit ? offset ?`, [limit, offset]);      
+    const whereClause = (where ? `where ?`: '');
+    const sqlBase = `select ${columns.join(',')} from ${table} limit ? offset ? ${whereClause}`;
+    const data = await db.query<T[] & RowDataPacket[]>(sqlBase, [limit, offset, where]);      
 
     // Construire la réponse
     const res: IIndexResponse<T> = {

@@ -12,6 +12,8 @@ export interface IIndexQuery {
   limit?: string;  
 }
 
+export type IReadWhere = Record<string, string|number>;
+
 /**
  * La structure d'une réponse à une requête Index.
  */

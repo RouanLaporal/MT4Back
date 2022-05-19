@@ -38,10 +38,10 @@ export class Crud {
     const offset = page * limit;
 
     // D'abord, récupérer le nombre total
-    const count = await db.query<ITableCount[] & RowDataPacket[]>(`select count(*) as total from ${table}`);      
+    const whereClause = (where ? `where ?`: '');
+    const count = await db.query<ITableCount[] & RowDataPacket[]>(`select count(*) as total from ${table} ${whereClause}`, [where]);      
 
     // Récupérer les lignes
-    const whereClause = (where ? `where ?`: '');
     const sqlBase = `select ${columns.join(',')} from ${table} ${whereClause} limit ? offset ?`;
     const data = await db.query<T[] & RowDataPacket[]>(sqlBase, [where, limit, offset].filter(e => e !== undefined));
 

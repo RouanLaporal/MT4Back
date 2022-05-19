@@ -42,7 +42,7 @@ export class Crud {
 
     // Récupérer les lignes
     const whereClause = (where ? `where ?`: '');
-    const sqlBase = `select ${columns.join(',')} from ${table} limit ? offset ? ${whereClause}`;
+    const sqlBase = `select ${columns.join(',')} from ${table} ${whereClause} limit ? offset ?`;
     const data = await db.query<T[] & RowDataPacket[]>(sqlBase, [limit, offset, where]);      
 
     // Construire la réponse

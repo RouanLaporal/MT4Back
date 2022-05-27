@@ -17,8 +17,6 @@ on user for each row set new.email = lower(trim(new.email));
 
 
 /* exemple */
-
-
 create table if not exists film (
   filmId int auto_increment not null,
   title varchar(256) not null, 

@@ -20,7 +20,7 @@ services:
     ports:
       - "3309:3306"
     env_file: 
-      - ./dbms/.env
+      - ./dbms/.env.dev
     command: [
       "--character-set-server=utf8mb4",
       "--collation-server=utf8mb4_unicode_ci",
@@ -28,6 +28,10 @@ services:
     volumes:
       - ./dbms/dbms-data:/var/lib/mysql
       - ./dbms/mariadb.cnf:/etc/mysql/mariadb.cnf
+      # Pointer vers un dossier qui aura des scripts d'initialisation de notre base
+      - ./dbms/dev-initdb.d:/docker-entrypoint-initdb.d
+      # Ajouter le DDL qui va tourner en dernier
+      - ./dbms/ddl/ddl.sql:/docker-entrypoint-initdb.d/999-ddl.sql
     networks:
       - app-network
 

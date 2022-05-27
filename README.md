@@ -1,32 +1,35 @@
 # Nodejs Boilerplate API
 
+Ce repo contient des exemples d'une base de projet en NodeJS/Typescript.
+
+La projet évolue au fur et à mesure dans les différentes branches. Utilisez `git checkout [nom de la branche]` afin de passer entre les branches.
+
 [[_TOC_]]
 
-# Mise en service
+## TL;DR
 
-On utilise Docker Dev Containers pour l'environnement de dev. Il faut ouvrir VS Code, est lorsque VSCode demande de rouvrir la fenêtre dans un dev-container, il faut cliquer sur oui.
+Lancez VSCode, et accepter de ré-ouvrir le projet dans un Dev Container.
 
-Cette fois-ci, on a amélioré le `Dockerfile.dev` afin de préinstaller quelques outils pratiques :
-* `mycli` : un client `mysql` qui permet de communiquer avec la base de données **au sein de notre dev-container**. Cela veut dire qu'on peut maintenant initialiser et modifier le schema de notre base du terminal dans VSCode.
-* `ts-node` et `typescript` : pour éviter l'install global, et pour que ces 2 commandes soit disponibles dans le terminal dans VSCode.
-
-[Regardez Dockerfile.dev](./Dockerfile.dev)
-
-Au premier lancement, il faut initialiser la base de données de test. Ouvrez une ligne de commande et tapez le commandes suivants :
+Dans VSCode, on peut facilement accéder à la base :
 
 ```sh
-# Créer la base "mtdb" et initialiser l'utilisateur de dev pour notre api
-mycli -h dbms -u root < ./dbms/init-dev.sql
-
-# Créer la structure de la base
-mycli -h dbms -u root -D mtdb < ./dbms/ddl.sql 
+mycli -h dbms -u root
+# Ensuite, utilisez le mot de passe dans .env.dev
 ```
-
-Pourquoi séparer en deux opérations ? Vous remarquez que le nom de la base `mtdb` est précisé maintenant dans la 2ème commande, et pas au sein du ddl. Cela veut dire qu'on peut réutiliser le même ddl en production, mais peut-être avec un autre nom.
 
 Pour lancer le serveur en développement (depuis un terminal dans VSCode) :
 
 ```sh
+# A faire une fois avant le premier lancement
+npm run install
+
+# Pour lancer l'API
 npm run api
 ```
 
+L'API est accessible à l'adresse : `http://localhost:5050`.
+
+
+## Explications
+
+1. [Setup du projet et factorisation](./documentation/001-factorisation/README.md)

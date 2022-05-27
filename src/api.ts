@@ -1,6 +1,5 @@
-import Express from "express";
+import Express, { json } from "express";
 import { ROUTES_USER } from './routes/auth/user';
-import { json } from 'body-parser';
 import { DefaultErrorHandler } from './middleware/error-handler';
 
 // Récupérer le port des variables d'environnement ou préciser une valeur par défaut

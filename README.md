@@ -21,7 +21,7 @@ Pour lancer le serveur en développement (depuis un terminal dans VSCode) :
 
 ```sh
 # A faire une fois avant le premier lancement
-npm run install
+npm install
 
 # Pour lancer l'API
 npm run api

@@ -37,7 +37,7 @@ Voici le morceau de [`docker-compose.dev.yml`](./docker-compose.dev.yml) qui a c
 > En séparant l'initialisation et le ddl, nous ouvrons les portes pour la création d'autres bases pour les fins différents. Par exemple, les tests automatiques.
 
 
-# Factorisation
+# Refactoring
 
 ## Un schema de nos données en TypeScript
 
@@ -45,7 +45,7 @@ Voici le morceau de [`docker-compose.dev.yml`](./docker-compose.dev.yml) qui a c
 * [Schema de la table user](../../src/types/tables/user/IUser.d.ts)
 
 
-## Factorisation de notre class utilitaire `Crud.ts`
+## Refactoring de notre class utilitaire `Crud.ts`
 
 * [Crud.ts](../../src/classes/Crud.ts)
     * Noter l'usage de génériques
@@ -59,7 +59,7 @@ Un exemple avec [AJV](https://github.com/ajv-validator/ajv)
 * [Validation de l'utilisateur avec avg](../../src/types/tables/user/user.validator.ts)
 * [Passer une validateur optional à Crud.ts](../../src/classes/Crud.ts)
 
-## Factorisation extrème
+## Refactoring extreme
 
 * [Une fonction qui créer des `Routers` Express à partir d'une définition](../../src/classes/CrudRouter.ts)
 * [Exemple d'usage de cette fonction](../../src/routes/auth/user.ts)

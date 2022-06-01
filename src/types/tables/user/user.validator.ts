@@ -3,25 +3,27 @@ import { IUserCreate, IUserUpdate } from './IUser';
 
 
 
-const UserCreateSchema : JSONSchemaType<IUserCreate> = {
+const UserCreateSchema: JSONSchemaType<IUserCreate> = {
   type: "object",
   properties: {
-    familyName: { type: 'string', nullable: true },
-    givenName: { type: 'string', nullable: true},
-    email: { type: 'string' },  
+    firstName: { type: 'string', nullable: true },
+    lastName: { type: 'string', nullable: true },
+    roleId: { type: 'number' },
+    email: { type: 'string' },
   },
-  required: ["email"],
+  required: ["email", "roleId"],
   additionalProperties: false,
 };
 
 
-const UserUpdateSchema : JSONSchemaType<IUserUpdate> = {
+const UserUpdateSchema: JSONSchemaType<IUserUpdate> = {
   type: "object",
   properties: {
-    familyName: { type: 'string', nullable: true },
-    givenName: { type: 'string', nullable: true },
-    email: { type: 'string', nullable: true },  
-  },  
+    firstName: { type: 'string', nullable: true },
+    lastName: { type: 'string', nullable: true },
+    roleId: { type: 'number', nullable: true },
+    email: { type: 'string', nullable: true },
+  },
   additionalProperties: false,
 };
 

@@ -1,13 +1,13 @@
 
 /* user */
 create table if not exists user (
-  userId int auto_increment not null,
+  userId int auto_increment not null primary key,
   email varchar(256) unique not null, 
   firstName varchar(256), 
   lastName varchar(256),
-  roleId varchar(256) not null,
-  primary key(userId),
-  foreign key(roleId) references role(roleId)
+  roleId int not null,
+  constraint `fk_role_user`
+    foreign key(roleId) references role(roleId) on delete cascade on update cascade
 );
 
 
@@ -61,8 +61,8 @@ create table if not exists challenge_user (
   userId int,
   promoId int,
   scoreId int,
-  foreign key(challengeId) references challenge(challengeId),
-  foreign key(userId) references user(userId),
-  foreign key promoId references promo(promoId),
-  foreign key(scoreId) references score(scoreId)
+  foreign key(challengeId) references challenge(challengeId) on delete cascade on update cascade,
+  foreign key(userId) references user(userId) on delete cascade on update cascade,
+  foreign key(promoId) references promo(promoId) on delete cascade on update cascade,
+  foreign key(scoreId) references score(scoreId) on delete cascade on update cascade
 );

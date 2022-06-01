@@ -7,7 +7,7 @@ create database IF NOT EXISTS challenge_project;
 
 /* Créer l'utilisateur API */
 create user IF NOT EXISTS 'api-dev'@'%.%.%.%' identified by 'api-dev-password';
-grant select, update, insert, delete, create challenge_project.* to 'api-dev'@'%.%.%.%';
+grant select, update, insert, delete on challenge_project.* to 'api-dev'@'%.%.%.%';
 grant trigger on challenge_project.* to 'api-dev'@'%.%.%.%';
 flush privileges;
 

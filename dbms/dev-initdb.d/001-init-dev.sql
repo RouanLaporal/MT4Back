@@ -11,3 +11,4 @@ grant select, update, insert, delete, create challenge_project.* to 'api-dev'@'%
 grant trigger on challenge_project.* to 'api-dev'@'%.%.%.%';
 flush privileges;
 
+ 

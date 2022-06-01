@@ -12,7 +12,7 @@ export interface IUser {
   lastName?: string;
   /** Admin || Normal User */
   roleId: number;
-  /** Adress e-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur */
+  /** Adresse-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur */
   email: string;
 }
 

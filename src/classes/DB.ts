@@ -17,8 +17,8 @@ export class DB {
       this.POOL = mysql.createPool({
         host: process.env.DB_HOST || 'dbms',
         user: process.env.DB_USER || 'api-dev',
-        database: process.env.DB_DATABASE || 'mtdb',
-        password: process.env.DB_PASSWORD || 'api-dev-password',  
+        database: process.env.DB_DATABASE || 'challenge_project',
+        password: process.env.DB_PASSWORD || 'api-dev-password',
       });
     }
 

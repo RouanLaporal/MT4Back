@@ -2,6 +2,8 @@ import Express, { json } from "express";
 import { ROUTES_USER } from './routes/auth/user';
 import { DefaultErrorHandler } from './middleware/error-handler';
 import { ROUTES_CHALLENGE } from './routes/challenge';
+import { ROUTES_SCORE } from "./routes/score";
+import { ROUTES_PROMO } from './routes/promo';
 
 // Récupérer le port des variables d'environnement ou préciser une valeur par défaut
 const PORT = process.env.PORT || 5050;
@@ -15,6 +17,10 @@ app.use(json());
 app.use('/auth/user', ROUTES_USER);
 
 app.use('/challenge', ROUTES_CHALLENGE);
+
+app.use('/score', ROUTES_SCORE);
+
+app.use('/promo', ROUTES_PROMO);
 
 // Ajouter un handler pour les erreurs
 app.use(DefaultErrorHandler);

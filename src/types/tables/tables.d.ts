@@ -1,4 +1,6 @@
 export type DbTable =
   'user' |
-  'challenge'
+  'challenge' |
+  'score' |
+  'promo'
   ;  

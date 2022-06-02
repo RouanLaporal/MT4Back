@@ -9,7 +9,7 @@ const ChallengeCreateSchema: JSONSchemaType<IChallengeCreate> = {
     },
     required: ['status', 'name'],
     additionalProperties: false,
-}
+};
 
 const ChallengeUpdateSchema: JSONSchemaType<IChallengeUpdate> = {
     type: "object",
@@ -18,7 +18,7 @@ const ChallengeUpdateSchema: JSONSchemaType<IChallengeUpdate> = {
         name: { type: 'string', nullable: true },
     },
     additionalProperties: false,
-}
+};
 
 const ajv = new Ajv();
 export const ChallengeCreateValidator = ajv.compile(ChallengeCreateSchema);

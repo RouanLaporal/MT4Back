@@ -1,22 +1,22 @@
-import Ajv, {JSONSchemaType } from "ajv";
+import Ajv, { JSONSchemaType } from "ajv";
 import { IScoreCreate, IScoreUpdate } from "./IScore";
 
 const ScoreCreateSchema: JSONSchemaType<IScoreCreate> = {
     type: "object",
     properties: {
-        nbScore : { type: 'number', nullable: false}
+        nbScore: { type: 'number', nullable: false }
     },
     required: ["nbScore"],
     additionalProperties: false
 };
 
 const ScoreUpdateSchema: JSONSchemaType<IScoreUpdate> = {
-  type: "object",
-  properties: {
-      nbScore: { type: 'number', nullable: false }
-  },
-  required: [],
-  additionalProperties: false
+    type: "object",
+    properties: {
+        nbScore: { type: 'number', nullable: false }
+    },
+    required: ["nbScore"],
+    additionalProperties: false
 };
 
 const ajv = new Ajv();

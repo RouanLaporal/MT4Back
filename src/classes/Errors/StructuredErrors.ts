@@ -1,15 +1,17 @@
-export type StructuredErrors = 
+export type StructuredErrors =
   // SQL
-  'sql/failed' |  
+  'sql/failed' |
   'sql/not-found' |
 
   // Crud
-  'validation/failed' | 
-    
+  'validation/failed' |
+
   // Authorization
-  'auth/unknown-email' |
+  'auth/invalid-credentials' |
+
+
 
 
   // Default
   'internal/unknown'
-;
+  ;

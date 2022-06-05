@@ -14,6 +14,10 @@ export interface IUser {
   roleId: number;
   /** Adresse-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur */
   email: string;
+
+  avatar: string;
+
+  password: string;
 }
 
 export type IUserCreate = Omit<IUser, 'userId'>;

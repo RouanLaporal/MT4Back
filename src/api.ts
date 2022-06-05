@@ -4,6 +4,8 @@ import { DefaultErrorHandler } from './middleware/error-handler';
 import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_SCORE } from "./routes/score";
 import { ROUTES_PROMO } from './routes/promo';
+import { ROUTES_SSH } from './routes/auth/ssh';
+import { signup } from "./middleware/authorization";
 
 // Récupérer le port des variables d'environnement ou préciser une valeur par défaut
 const PORT = process.env.PORT || 5050;
@@ -11,10 +13,13 @@ const PORT = process.env.PORT || 5050;
 // Créer l'objet Express
 const app = Express();
 
+
 // L'appli parse le corps du message entrant comme du json
 app.use(json());
 
 app.use('/auth/user', ROUTES_USER);
+
+app.use('auth/ssh', ROUTES_SSH)
 
 app.use('/challenge', ROUTES_CHALLENGE);
 

@@ -10,6 +10,8 @@ const UserCreateSchema: JSONSchemaType<IUserCreate> = {
     lastName: { type: 'string', nullable: true },
     roleId: { type: 'number' },
     email: { type: 'string' },
+    avatar: { type: 'string' },
+    password: { type: 'string' },
   },
   required: ["email", "roleId"],
   additionalProperties: false,
@@ -23,6 +25,8 @@ const UserUpdateSchema: JSONSchemaType<IUserUpdate> = {
     lastName: { type: 'string', nullable: true },
     roleId: { type: 'number', nullable: true },
     email: { type: 'string', nullable: true },
+    avatar: { type: 'string', nullable: true },
+    password: { type: 'string', nullable: true },
   },
   additionalProperties: false,
 };

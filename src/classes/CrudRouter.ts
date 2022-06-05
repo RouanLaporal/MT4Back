@@ -16,7 +16,7 @@ export enum CrudOperations {
   All = ~0
 }
 
-export interface ICrudRouterOptions<CreateStructure,UpdateStructure> {
+export interface ICrudRouterOptions<CreateStructure, UpdateStructure> {
   /**
    * Nom de la table référencée par l'opération CRUD
    */
@@ -52,15 +52,15 @@ export const CrudRouter = <RecordStructure, CreateStructure, UpdateStructure>(op
 
   // Operations sans identifiant  
   const routerIndex = Router({ mergeParams: true });
-  
+
   // Index: GET /
   if ((options.operations & CrudOperations.Index) > 0) {
     routerIndex.get<{}, IIndexResponse<RecordStructure>, {}, IIndexQuery>('/',
       async (request, response, next: NextFunction) => {
 
-        try {      
-          
-          const result = await Crud.Index<RecordStructure>(request.query, options.table, options.readColumns || ['*']);      
+        try {
+
+          const result = await Crud.Index<RecordStructure>(request.query, options.table, options.readColumns || ['*']);
           response.json(result);
 
         } catch (err: any) {
@@ -88,7 +88,7 @@ export const CrudRouter = <RecordStructure, CreateStructure, UpdateStructure>(op
     );
   }
 
-  crud.use(routerIndex);  
+  crud.use(routerIndex);
 
   // Operation sur une ligne précise, identifié par :recordId
   if (options.operations >= 4) {
@@ -103,7 +103,7 @@ export const CrudRouter = <RecordStructure, CreateStructure, UpdateStructure>(op
       routerSingle.get<ISingleParams, RecordStructure, {}, {}>('/',
         async (request, response, next: NextFunction) => {
 
-          try {            
+          try {
             const result = await Crud.Read<RecordStructure>(options.table, options.primaryKey, parseInt(request.params.recordId), options.readColumns);
             response.json(result);
 
@@ -122,7 +122,7 @@ export const CrudRouter = <RecordStructure, CreateStructure, UpdateStructure>(op
       routerSingle.put<ISingleParams, IUpdateResponse, UpdateStructure, {}>('/',
         async (request, response, next: NextFunction) => {
 
-          try {            
+          try {
             const result = await Crud.Update<UpdateStructure>(request.body, options.table, options.primaryKey, parseInt(request.params.recordId), options.validators?.update);
             response.json(result);
 
@@ -140,7 +140,7 @@ export const CrudRouter = <RecordStructure, CreateStructure, UpdateStructure>(op
       routerSingle.delete<ISingleParams, IUpdateResponse, {}, {}>('/',
         async (request, response, next: NextFunction) => {
 
-          try {            
+          try {
             const result = await Crud.Delete(options.table, options.primaryKey, parseInt(request.params.recordId));
             response.json(result);
 

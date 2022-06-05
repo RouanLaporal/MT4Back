@@ -6,6 +6,8 @@ create table if not exists user (
   firstName varchar(256), 
   lastName varchar(256),
   roleId int not null,
+  avatar varchar(256),
+  password varchar(256),
   constraint `fk_role_user`
     foreign key(roleId) references role(roleId) on delete cascade on update cascade
 );
@@ -50,8 +52,8 @@ create table if not exists promo (
 /* ssh */
 create table if not exists ssh (
   sshId int auto_increment not null,
-  sshUserName varchar(256) not null,
-  sshIpAdress varchar(256) not null,
+  UserName varchar(256) not null,
+  IpAddress varchar(256) not null,
   primary key(sshId)
 );
 

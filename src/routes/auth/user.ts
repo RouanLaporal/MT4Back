@@ -9,6 +9,8 @@ import { IIndexQuery, IIndexResponse } from '../../types/api/IIndexQuery';
 import { ApiError } from '../../classes/Errors/ApiError';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const generateUniqueId = require('generate-unique-id');
+require("dotenv").config();
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
 
@@ -30,7 +32,41 @@ routerIndex.post<{}, ICreateResponse, IUserCreate>('/',
       const user = request.body;
 
       user.password = bcrypt.hashSync(user.password, 10);
-
+      const unique_code = generateUniqueId({
+        length: 5,
+        useLetters: false
+      });
+      const mailjet = require('node-mailjet')
+        .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
+      const mj_request = mailjet
+        .post("send", { 'version': 'v3.1' })
+        .request({
+          "Messages": [
+            {
+              "From": {
+                "Email": "rouan.laporal@outlook.com",
+                "Name": "Rouan"
+              },
+              "To": [
+                {
+                  "Email": user.email,
+                  "Name": user.firstName
+                }
+              ],
+              "Subject": "Verification Code",
+              "TextPart": unique_code,
+              "HTMLPart": "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!",
+              "CustomID": "CodeVerification"
+            }
+          ]
+        })
+      mj_request
+        .then((result: any) => {
+          console.log(result.body)
+        })
+        .catch((err: any) => {
+          console.log(err.statusCode)
+        })
       const db = DB.Connection;
       const data = await db.query<OkPacket>("insert into user set ?", user);
 

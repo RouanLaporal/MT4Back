@@ -10,6 +10,7 @@ import { ApiError } from '../../classes/Errors/ApiError';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateUniqueId = require('generate-unique-id');
+const fs = require('fs');
 require("dotenv").config();
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
@@ -89,6 +90,8 @@ routerSimple.post<{}, string, {}>('/login',
       const email: string = request.body.email
       const password: string = request.body.password
       const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
+      var privateKey = fs.readFileSync('./key/privateKey.sh', 'utf8');
+
       if (!data[0][0]) {
         next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
       }
@@ -97,7 +100,7 @@ routerSimple.post<{}, string, {}>('/login',
           next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
         else
           response.status(200).json({
-            token: jwt.sign({ foo: 'bar' }, 'shhhhh') //avec clé privée
+            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }) //avec clé privée
           })
       })
     } catch (err) {

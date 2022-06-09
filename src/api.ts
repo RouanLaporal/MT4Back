@@ -14,7 +14,8 @@ const PORT = process.env.PORT || 5050;
 // Créer l'objet Express
 const app = Express();
 app.use(cors({
-  origin: '*'
+  origin: '*',
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
 }));
 
 // L'appli parse le corps du message entrant comme du json

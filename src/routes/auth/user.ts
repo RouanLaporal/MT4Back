@@ -26,7 +26,7 @@ export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
   }
 });
 
-routerIndex.post<{}, ICreateResponse, IUserCreate>('/',
+routerIndex.post<{}, {}, IUserCreate>('/',
   async (request, response, next: NextFunction) => {
 
     try {
@@ -56,7 +56,6 @@ routerIndex.post<{}, ICreateResponse, IUserCreate>('/',
               ],
               "Subject": "Verification Code",
               "TextPart": unique_code,
-              "HTMLPart": "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!",
               "CustomID": "CodeVerification"
             }
           ]
@@ -73,7 +72,8 @@ routerIndex.post<{}, ICreateResponse, IUserCreate>('/',
       const data = await db.query<OkPacket>("insert into user set ?", user);
 
       response.json({
-        id: data[0].insertId
+        id: data[0].insertId,
+        unique_code: unique_code
       });
 
     } catch (err: any) {
@@ -82,6 +82,13 @@ routerIndex.post<{}, ICreateResponse, IUserCreate>('/',
 
   }
 );
+
+routerSimple.post('/verification-code', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+})
 
 routerSimple.post<{}, string, {}>('/login',
   async (request: Request, response: Response, next: NextFunction) => {
@@ -109,6 +116,27 @@ routerSimple.post<{}, string, {}>('/login',
   }
 )
 
+routerSimple.post('/reset-password', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const db = DB.Connection
+    const email: string = request.body.email
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+    //TODO: send a code to reset password
+  } catch (err) {
+    next(err);
+  }
+})
+
+routerSimple.post('/change-password', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const db = DB.Connection
+    const email: string = request.body.email
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
+    //TODO: compare old password, then change password in db if their match
+  } catch (err) {
+    next(err);
+  }
+})
 const route_user = Router({ mergeParams: true })
 route_user.use(route_RUD);
 route_user.use(routerIndex);

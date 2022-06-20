@@ -10,6 +10,7 @@ import { ApiError } from '../../classes/Errors/ApiError';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateUniqueId = require('generate-unique-id');
+const fs = require('fs');
 require("dotenv").config();
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
@@ -66,6 +67,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         .catch((err: any) => {
           console.log(err.statusCode)
         })
+        
       const db = DB.Connection;
       const data = await db.query<OkPacket>("insert into user set ?", user);
 
@@ -94,7 +96,9 @@ routerSimple.post<{}, string, {}>('/login',
       const db = DB.Connection
       const email: string = request.body.email
       const password: string = request.body.password
-      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+      const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
+      var privateKey = fs.readFileSync('./key/privateKey.sh', 'utf8');
+
       if (!data[0][0]) {
         next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
       }
@@ -103,12 +107,7 @@ routerSimple.post<{}, string, {}>('/login',
           next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
         else
           response.status(200).json({
-            firstName: data[0][0].firstName,
-            lastName: data[0][0].lastName,
-            avatar: data[0][0].avatar,
-            email: data[0][0].email,
-            roleId: data[0][0].roleId,
-            token: jwt.sign({ foo: 'bar' }, 'shhhhh') //avec clé privée
+            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }) //avec clé privée
           })
       })
     } catch (err) {

@@ -7,6 +7,7 @@ import { DB } from '../../classes/DB';
 import { ICreateResponse } from '../../types/api/ICreateResponse';
 import { IIndexQuery, IIndexResponse } from '../../types/api/IIndexQuery';
 import { ApiError } from '../../classes/Errors/ApiError';
+import { validationEmail, validationPassword } from '../../middleware/validForm';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateUniqueId = require('generate-unique-id');
@@ -26,7 +27,9 @@ export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
   }
 });
 
-routerIndex.post<{}, {}, IUserCreate>('/',
+routerIndex.post<{}, {}, IUserCreate>('/', 
+  validationEmail(),
+  validationPassword(),
   async (request, response, next: NextFunction) => {
 
     try {

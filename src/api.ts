@@ -5,8 +5,8 @@ import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_SCORE } from "./routes/score";
 import { ROUTES_PROMO } from './routes/promo';
 import { ROUTES_SSH } from './routes/auth/ssh';
-import { authorization } from "./middleware/authorization";
-
+const { Client } = require('ssh2');
+const { readFileSync } = require('fs');
 const cors = require('cors');
 // Récupérer le port des variables d'environnement ou préciser une valeur par défaut
 const PORT = process.env.PORT || 5050;

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { NextFunction, request, Request, Response, Router } from 'express';
 import { CrudOperations, CrudRouter } from '../../classes/CrudRouter';
 import { IUserCreate, IUserRO, IUserUpdate } from '../../types/tables/user/IUser';
 import { UserCreateValidator, UserUpdateValidator } from '../../types/tables/user/user.validator';
@@ -32,13 +32,25 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   async (request, response, next: NextFunction) => {
 
     try {
-      const user = request.body;
-
+      let user = request.body;
       user.password = bcrypt.hashSync(user.password, 10);
+
+      const db = DB.Connection;
+      user = { ...user, roleId: 1 }
+      const data = await db.query<OkPacket>("insert into user set ?", user);
+      const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+
       const unique_code = generateUniqueId({
         length: 5,
         useLetters: false
       });
+
+      const validation = {
+        code: unique_code,
+        userId: data[0].insertId
+      }
+      await db.query<OkPacket>("insert into validation set ?", validation);
+
       const mailjet = require('node-mailjet')
         .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
       const mj_request = mailjet
@@ -70,11 +82,14 @@ routerIndex.post<{}, {}, IUserCreate>('/',
           console.log(err.statusCode)
         })
 
-      const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into user set ?", user);
-
       response.json({
-        id: data[0].insertId
+        token: jwt.sign({
+          userId: data[0].insertId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatar: null,
+          email: user.email,
+        }, privateKey, { algorithm: 'RS256' })
       });
 
     } catch (err: any) {
@@ -84,8 +99,22 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   }
 );
 
-routerSimple.post('/verification-code', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/verification-code/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
+    const { id } = request.params
+    const code = request.body
+
+    const db = DB.Connection;
+    const data = await db.query<RowDataPacket[]>("select code from validation where userId = ?", id);
+
+    if (Number(data[0][0].code) !== Number(code.code)) {
+      return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
+    }
+
+    await db.query<OkPacket>("update user set isValid = true where userId = ?", id);
+    await db.query<OkPacket>("delete from validation where userId = ?", id);
+
+    response.json(true)
   } catch (error) {
     next(error);
   }
@@ -97,9 +126,9 @@ routerSimple.post<{}, string, {}>('/login',
       const db = DB.Connection
       const email: string = request.body.email
       const password: string = request.body.password
-      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
-      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key');
-      var token = jwt.sign({ userId: data[0][0].userId }, privateKey, { algorithm: 'RS256' })
+      const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
+      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+
       if (!data[0][0]) {
         next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
       }
@@ -108,7 +137,7 @@ routerSimple.post<{}, string, {}>('/login',
           next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
         else
           response.status(200).json({
-            token: token //avec clé privée
+            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' })
           })
       })
     } catch (err) {
@@ -117,12 +146,65 @@ routerSimple.post<{}, string, {}>('/login',
   }
 )
 
-routerSimple.post('/reset-password', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/forget-password', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const db = DB.Connection
-    const email: string = request.body.email
+    const db = DB.Connection;
+    const email: string = request.body.email;
     const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
-    //TODO: send a code to reset password
+
+    if (!data[0][0]) {
+      next(new ApiError(403, 'auth/invalid-credentials', 'User not found'));
+    } else {
+      const unique_code = generateUniqueId({
+        length: 5,
+        useLetters: false
+      });
+      const mailjet = require('node-mailjet')
+        .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
+      const mj_request = mailjet
+        .post("send", { 'version': 'v3.1' })
+        .request({
+          "Messages": [
+            {
+              "From": {
+                "Email": "rouan.laporal@outlook.com",
+                "Name": "Rouan"
+              },
+              "To": [
+                {
+                  "Email": email,
+                  "Name": data[0][0].firstName
+                }
+              ],
+              "Subject": "Reset Password",
+              "TextPart": `http://localhost:5050/auth/user/reset-password/${data[0][0].userId}`,
+              "CustomID": "CodeVerification"
+            }
+          ]
+        })
+
+      response.json(
+        "Success"
+      );
+    }
+
+  } catch (err) {
+    next(err);
+  }
+})
+
+routerSimple.post('/reset-password/:id', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const db = DB.Connection;
+    const { id } = request.params;
+    console.log("apres reverse, " + id)
+    var password: string = request.body.password;
+
+    password = bcrypt.hashSync(password, 10);
+    db.query<OkPacket>("update user set password=? where userId=?", [password, id]);
+    response.json(
+      "Success"
+    )
   } catch (err) {
     next(err);
   }
@@ -132,8 +214,24 @@ routerSimple.post('/change-password', async (request: Request, response: Respons
   try {
     const db = DB.Connection
     const email: string = request.body.email
-    const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
-    //TODO: compare old password, then change password in db if their match
+    const oldPassword: string = request.body.password
+    var newPassword: string = request.body.newPassword
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+
+    if (!data[0][0]) {
+      next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
+    }
+    bcrypt.compare(oldPassword, data[0][0].password).then((res: boolean) => {
+      if (res === false) {
+        next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
+      } else {
+        newPassword = bcrypt.hashSync(newPassword, 10)
+        db.query<OkPacket>('update user set password = ? where email = ?', [newPassword, email])
+        response.status(200).json(
+          true
+        )
+      }
+    })
   } catch (err) {
     next(err);
   }

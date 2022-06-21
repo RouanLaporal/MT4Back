@@ -7,6 +7,7 @@ import { DB } from '../../classes/DB';
 import { ICreateResponse } from '../../types/api/ICreateResponse';
 import { IIndexQuery, IIndexResponse } from '../../types/api/IIndexQuery';
 import { ApiError } from '../../classes/Errors/ApiError';
+import { authorization } from '../../middleware/authorization';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateUniqueId = require('generate-unique-id');
@@ -25,6 +26,7 @@ export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
     update: UserUpdateValidator
   }
 });
+
 
 routerIndex.post<{}, {}, IUserCreate>('/',
   async (request, response, next: NextFunction) => {
@@ -67,13 +69,12 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         .catch((err: any) => {
           console.log(err.statusCode)
         })
-        
+
       const db = DB.Connection;
       const data = await db.query<OkPacket>("insert into user set ?", user);
 
       response.json({
-        id: data[0].insertId,
-        unique_code: unique_code
+        id: data[0].insertId
       });
 
     } catch (err: any) {
@@ -96,9 +97,9 @@ routerSimple.post<{}, string, {}>('/login',
       const db = DB.Connection
       const email: string = request.body.email
       const password: string = request.body.password
-      const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
-      var privateKey = fs.readFileSync('./key/privateKey.sh', 'utf8');
-
+      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key');
+      var token = jwt.sign({ userId: data[0][0].userId }, privateKey, { algorithm: 'RS256' })
       if (!data[0][0]) {
         next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
       }
@@ -107,7 +108,7 @@ routerSimple.post<{}, string, {}>('/login',
           next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
         else
           response.status(200).json({
-            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }) //avec clé privée
+            token: token //avec clé privée
           })
       })
     } catch (err) {
@@ -137,6 +138,7 @@ routerSimple.post('/change-password', async (request: Request, response: Respons
     next(err);
   }
 })
+
 const route_user = Router({ mergeParams: true })
 route_user.use(route_RUD);
 route_user.use(routerIndex);

@@ -5,7 +5,7 @@ import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_SCORE } from "./routes/score";
 import { ROUTES_PROMO } from './routes/promo';
 import { ROUTES_SSH } from './routes/auth/ssh';
-import { signup } from "./middleware/authorization";
+import { authorization } from "./middleware/authorization";
 
 const cors = require('cors');
 // Récupérer le port des variables d'environnement ou préciser une valeur par défaut
@@ -34,7 +34,7 @@ app.use(json());
 
 app.use('/auth/user', ROUTES_USER);
 
-app.use('auth/ssh', ROUTES_SSH)
+app.use('/auth/ssh', ROUTES_SSH)
 
 app.use('/challenge', ROUTES_CHALLENGE);
 

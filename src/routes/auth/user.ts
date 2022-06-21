@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { NextFunction, request, Request, Response, Router } from 'express';
 import { CrudOperations, CrudRouter } from '../../classes/CrudRouter';
 import { IUserCreate, IUserRO, IUserUpdate } from '../../types/tables/user/IUser';
 import { UserCreateValidator, UserUpdateValidator } from '../../types/tables/user/user.validator';
@@ -11,6 +11,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateUniqueId = require('generate-unique-id');
 const fs = require('fs');
+const md5 = require('md5');
+var reverseMd5 = require('reverse-md5');
 require("dotenv").config();
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
@@ -116,12 +118,75 @@ routerSimple.post<{}, string, {}>('/login',
   }
 )
 
-routerSimple.post('/reset-password', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/forget-password', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const db = DB.Connection
-    const email: string = request.body.email
+    const db = DB.Connection;
+    const email: string = request.body.email;
     const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
-    //TODO: send a code to reset password
+
+    if(!data[0][0]) {
+      next(new ApiError(403, 'auth/invalid-credentials', 'User not found'));
+    } else {
+      const unique_code = generateUniqueId({
+        length: 5,
+        useLetters: false
+      });
+      const idCrypt = md5(data[0][0].userId);
+      const mailjet = require('node-mailjet')
+        .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
+      const mj_request = mailjet
+        .post("send", { 'version': 'v3.1' })
+        .request({
+          "Messages": [
+            {
+              "From": {
+                "Email": "rouan.laporal@outlook.com",
+                "Name": "Rouan"
+              },
+              "To": [
+                {
+                  "Email": email,
+                  "Name": data[0][0].firstName
+                }
+              ],
+              "Subject": "Reset Password",
+              "TextPart": `http://localhost:5050/auth/user/reset-password/${idCrypt}`,
+              "CustomID": "CodeVerification"
+            }
+          ]
+        })
+
+      response.json(
+        "Success"
+      );
+    }
+    
+  } catch (err) {
+    next(err);
+  }
+})
+
+routerSimple.post('/reset-password/:id', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const db = DB.Connection;
+    console.log("avant reverse, " +request.params)
+    var rev = reverseMd5({
+      lettersUpper: false,
+      lettersLower: true,
+      numbers: true,
+      special: false,
+      whitespace: true,
+      maxLen: 12
+    })
+    const {id} = rev(request.params);
+    console.log("apres reverse") 
+    var password: string = request.body.password;
+
+    password = bcrypt.hashSync(password, 10);
+    db.query<OkPacket>("update user set password=? where userId=?", [password, id]);
+    response.json(
+      "Success"
+    )
   } catch (err) {
     next(err);
   }
@@ -133,7 +198,7 @@ routerSimple.post('/change-password', async (request: Request, response: Respons
     const email: string = request.body.email
     const oldPassword: string = request.body.password
     var newPassword: string = request.body.newPassword
-    const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
 
     if(!data[0][0]) {
       next (new ApiError(403, 'auth/invalid-credentials', 'User not found'))

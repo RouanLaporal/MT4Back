@@ -97,7 +97,7 @@ routerSimple.post<{}, string, {}>('/login',
       const email: string = request.body.email
       const password: string = request.body.password
       const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
-      var privateKey = fs.readFileSync('./key/privateKey.sh', 'utf8');
+      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
       if (!data[0][0]) {
         next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
@@ -107,7 +107,7 @@ routerSimple.post<{}, string, {}>('/login',
           next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
         else
           response.status(200).json({
-            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }) //avec clé privée
+            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' })
           })
       })
     } catch (err) {
@@ -131,8 +131,24 @@ routerSimple.post('/change-password', async (request: Request, response: Respons
   try {
     const db = DB.Connection
     const email: string = request.body.email
+    const oldPassword: string = request.body.password
+    var newPassword: string = request.body.newPassword
     const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
-    //TODO: compare old password, then change password in db if their match
+
+    if(!data[0][0]) {
+      next (new ApiError(403, 'auth/invalid-credentials', 'User not found'))
+    }
+    bcrypt.compare(oldPassword, data[0][0].password).then((res:boolean) =>{
+      if(res === false) {
+        next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
+      } else {
+        newPassword = bcrypt.hashSync(newPassword, 10)
+        db.query<OkPacket>('update user set password = ? where email = ?', [newPassword, email])
+        response.status(200).json(
+          true
+        )
+      }
+    })
   } catch (err) {
     next(err);
   }

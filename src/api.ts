@@ -5,8 +5,8 @@ import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_SCORE } from "./routes/score";
 import { ROUTES_PROMO } from './routes/promo';
 import { ROUTES_SSH } from './routes/auth/ssh';
-import { signup } from "./middleware/authorization";
-
+const { Client } = require('ssh2');
+const { readFileSync } = require('fs');
 const cors = require('cors');
 // Récupérer le port des variables d'environnement ou préciser une valeur par défaut
 const PORT = process.env.PORT || 5050;
@@ -28,6 +28,27 @@ app.use((req, res, next) => {
   )
   next()
 })
+const conn = new Client();
+app.use(
+  conn.on('ready', () => {
+    console.log('Client :: ready');
+    conn.exec('uptime', (err: any, stream: any) => {
+      if (err) throw err;
+      stream.on('close', (code: any, signal: any) => {
+        console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+        conn.end();
+      }).on('data', (data: any) => {
+        console.log('STDOUT: ' + data);
+      }).stderr.on('data', (data: any) => {
+        console.log('STDERR: ' + data);
+      });
+    });
+  }).connect({
+    host: '142.93.233.40',
+    port: 22,
+    username: 'root',
+    privateKey: readFileSync()
+  }));
 
 // L'appli parse le corps du message entrant comme du json
 app.use(json());

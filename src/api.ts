@@ -28,27 +28,6 @@ app.use((req, res, next) => {
   )
   next()
 })
-const conn = new Client();
-app.use(
-  conn.on('ready', () => {
-    console.log('Client :: ready');
-    conn.exec('uptime', (err: any, stream: any) => {
-      if (err) throw err;
-      stream.on('close', (code: any, signal: any) => {
-        console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
-        conn.end();
-      }).on('data', (data: any) => {
-        console.log('STDOUT: ' + data);
-      }).stderr.on('data', (data: any) => {
-        console.log('STDERR: ' + data);
-      });
-    });
-  }).connect({
-    host: '142.93.233.40',
-    port: 22,
-    username: 'root',
-    privateKey: readFileSync()
-  }));
 
 // L'appli parse le corps du message entrant comme du json
 app.use(json());

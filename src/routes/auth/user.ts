@@ -11,8 +11,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateUniqueId = require('generate-unique-id');
 const fs = require('fs');
-const md5 = require('md5');
-var reverseMd5 = require('reverse-md5');
 require("dotenv").config();
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
@@ -131,7 +129,6 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
         length: 5,
         useLetters: false
       });
-      const idCrypt = md5(data[0][0].userId);
       const mailjet = require('node-mailjet')
         .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
       const mj_request = mailjet
@@ -150,7 +147,7 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
                 }
               ],
               "Subject": "Reset Password",
-              "TextPart": `http://localhost:5050/auth/user/reset-password/${idCrypt}`,
+              "TextPart": `http://localhost:5050/auth/user/reset-password/${data[0][0].userId}`,
               "CustomID": "CodeVerification"
             }
           ]
@@ -169,17 +166,8 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
 routerSimple.post('/reset-password/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const db = DB.Connection;
-    console.log("avant reverse, " + request.params)
-    // var rev = reverseMd5({
-    //   lettersUpper: false,
-    //   lettersLower: true,
-    //   numbers: true,
-    //   special: false,
-    //   whitespace: true,
-    //   maxLen: 12
-    // })
     const { id } = request.params;
-    console.log("apres reverse")
+    console.log("apres reverse, " + id)
     var password: string = request.body.password;
 
     password = bcrypt.hashSync(password, 10);

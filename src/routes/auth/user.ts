@@ -36,6 +36,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
       const db = DB.Connection;
       user = { ...user, roleId: 1 }
       const data = await db.query<OkPacket>("insert into user set ?", user);
+      const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
       const unique_code = generateUniqueId({
         length: 5,
@@ -80,12 +81,13 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         })
 
       response.json({
-        userId: data[0].insertId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        avatar: null,
-        email: user.email,
-        token: jwt.sign({ foo: 'bar' }, 'shhhhh')
+        token: jwt.sign({
+          userId: data[0].insertId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatar: null,
+          email: user.email,
+        }, privateKey, { algorithm: 'RS256' })
       });
 
     } catch (err: any) {

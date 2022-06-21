@@ -79,9 +79,6 @@ routerIndex.post<{}, {}, IUserCreate>('/',
           console.log(err.statusCode)
         })
 
-      const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into user set ?", user);
-
       response.json({
         userId: data[0].insertId,
         firstName: user.firstName,

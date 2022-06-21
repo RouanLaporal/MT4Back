@@ -28,7 +28,7 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
             const data = await db.query<OkPacket>("insert into promo set ?", name)
 
             response.json({
-                id: data[0].insertId,
+                promoId: data[0].insertId,
                 name: name.name
             })
         } catch (error) {
@@ -83,7 +83,6 @@ routerSimple.delete<{}, {}, IPromo>('/:id',
 
             const db = DB.Connection
             const data = await db.query<OkPacket>("delete from promo where promoId = ?", id)
-            console.log(data)
 
             response.json({
                 id

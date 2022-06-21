@@ -9,6 +9,9 @@ export type StructuredErrors =
   // Authorization
   'auth/invalid-credentials' |
 
+  // Validation
+  'validation/invalid-code' |
+
 
 
 

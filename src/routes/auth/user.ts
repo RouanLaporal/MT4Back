@@ -29,13 +29,24 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   async (request, response, next: NextFunction) => {
 
     try {
-      const user = request.body;
-
+      let user = request.body;
       user.password = bcrypt.hashSync(user.password, 10);
+
+      const db = DB.Connection;
+      user = { ...user, roleId: 1 }
+      const data = await db.query<OkPacket>("insert into user set ?", user);
+
       const unique_code = generateUniqueId({
         length: 5,
         useLetters: false
       });
+
+      const validation = {
+        code: unique_code,
+        userId: data[0].insertId
+      }
+      await db.query<OkPacket>("insert into validation set ?", validation);
+
       const mailjet = require('node-mailjet')
         .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
       const mj_request = mailjet
@@ -66,12 +77,14 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         .catch((err: any) => {
           console.log(err.statusCode)
         })
-      const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into user set ?", user);
 
       response.json({
-        id: data[0].insertId,
-        unique_code: unique_code
+        userId: data[0].insertId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatar: null,
+        email: user.email,
+        token: jwt.sign({ foo: 'bar' }, 'shhhhh')
       });
 
     } catch (err: any) {
@@ -81,8 +94,22 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   }
 );
 
-routerSimple.post('/verification-code', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/verification-code/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
+    const { id } = request.params
+    const code = request.body
+
+    const db = DB.Connection;
+    const data = await db.query<RowDataPacket[]>("select code from validation where userId = ?", id);
+
+    if (Number(data[0][0].code) !== Number(code.code)) {
+      return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
+    }
+
+    await db.query<OkPacket>("update user set isValid = true where userId = ?", id);
+    await db.query<OkPacket>("delete from validation where userId = ?", id);
+
+    response.json(true)
   } catch (error) {
     next(error);
   }
@@ -107,7 +134,6 @@ routerSimple.post<{}, string, {}>('/login',
             lastName: data[0][0].lastName,
             avatar: data[0][0].avatar,
             email: data[0][0].email,
-            roleId: data[0][0].roleId,
             token: jwt.sign({ foo: 'bar' }, 'shhhhh') //avec clé privée
           })
       })

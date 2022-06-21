@@ -8,6 +8,7 @@ create table if not exists user (
   roleId int not null,
   avatar varchar(256),
   password varchar(256),
+  isValid boolean,
   constraint `fk_role_user`
     foreign key(roleId) references role(roleId) on delete cascade on update cascade
 );
@@ -18,6 +19,15 @@ drop trigger if exists before_insert_user;
 create trigger before_insert_user
 before insert
 on user for each row set new.email = lower(trim(new.email));
+
+/* validation */
+create table if not exists validation (
+  validationId int auto_increment not null,
+  code int,
+  userId int,
+  primary key(validationId),
+  foreign key(userId) references user(userId) on delete cascade on update cascade
+);
 
 
 /* challenge */

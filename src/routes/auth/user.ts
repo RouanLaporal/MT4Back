@@ -194,11 +194,10 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
   }
 })
 
-routerSimple.post('/reset-password/:id', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/reset-password/:id', validationPassword(), async (request: Request, response: Response, next: NextFunction) => {
   try {
     const db = DB.Connection;
     const { id } = request.params;
-    console.log("apres reverse, " + id)
     var password: string = request.body.password;
 
     password = bcrypt.hashSync(password, 10);
@@ -211,12 +210,12 @@ routerSimple.post('/reset-password/:id', async (request: Request, response: Resp
   }
 })
 
-routerSimple.post('/change-password', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/change-password', validationPassword(), async (request: Request, response: Response, next: NextFunction) => {
   try {
     const db = DB.Connection
     const email: string = request.body.email
-    const oldPassword: string = request.body.password
-    var newPassword: string = request.body.newPassword
+    const oldPassword: string = request.body.oldPassword
+    var newPassword: string = request.body.password
     const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
 
     if (!data[0][0]) {

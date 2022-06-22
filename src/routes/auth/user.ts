@@ -28,18 +28,17 @@ export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
 });
 
 
+
 routerIndex.post<{}, {}, IUserCreate>('/',
   async (request, response, next: NextFunction) => {
 
     try {
       let user = request.body;
       user.password = bcrypt.hashSync(user.password, 10);
-
       const db = DB.Connection;
       user = { ...user, roleId: 1 }
       const data = await db.query<OkPacket>("insert into user set ?", user);
       const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
-
       const unique_code = generateUniqueId({
         length: 5,
         useLetters: false
@@ -81,16 +80,9 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         .catch((err: any) => {
           console.log(err.statusCode)
         })
-
-      response.json({
-        token: jwt.sign({
-          userId: data[0].insertId,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          avatar: null,
-          email: user.email,
-        }, privateKey, { algorithm: 'RS256' })
-      });
+      response.header('Authorization', jwt.sign({ userId: data[0].insertId, }, privateKey, { algorithm: 'RS256' }));
+      response.redirect('http://localhost:5050/auth/user/verification-code/' + data[0].insertId)
+      next();
 
     } catch (err: any) {
       next(err);
@@ -126,7 +118,7 @@ routerSimple.post<{}, string, {}>('/login',
       const db = DB.Connection
       const email: string = request.body.email
       const password: string = request.body.password
-      const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from user where email = ?", email);
+      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
       var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
       if (!data[0][0]) {
@@ -137,7 +129,13 @@ routerSimple.post<{}, string, {}>('/login',
           next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
         else
           response.status(200).json({
-            token: jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' })
+            token: jwt.sign({
+              userId: data[0][0].userId,
+              firstName: data[0][0].firstName,
+              lastName: data[0][0].lastName,
+              avatar: null,
+              email: data[0][0].email,
+            }, privateKey, { algorithm: 'RS256' })
           })
       })
     } catch (err) {

@@ -4,19 +4,20 @@ import { IChallengeCreate, IChallengeUpdate } from './IChallenge';
 const ChallengeCreateSchema: JSONSchemaType<IChallengeCreate> = {
     type: "object",
     properties: {
-        status: { type: 'string' },
-        name: { type: 'string' }
+        challenge: { type: 'string' },
+        is_active: { type: 'boolean' }
     },
-    required: ['status', 'name'],
+    required: ['challenge', 'is_active'],
     additionalProperties: false,
 };
 
 const ChallengeUpdateSchema: JSONSchemaType<IChallengeUpdate> = {
     type: "object",
     properties: {
-        status: { type: 'string', nullable: true },
-        name: { type: 'string', nullable: true },
+        challenge: { type: 'string', nullable: true },
+        is_active: { type: 'boolean', nullable: true }
     },
+    required: [],
     additionalProperties: false,
 };
 

@@ -4,16 +4,18 @@ import { IPromoCreate, IPromoUpdate } from './IPromo';
 const PromoCreateSchema: JSONSchemaType<IPromoCreate> = {
     type: "object",
     properties: {
-        name: { type: "string", nullable: false }
+        promo: { type: "string", nullable: false },
+        user_id: { type: "number"}
     },
-    required: ["name"],
+    required: ["promo"],
     additionalProperties: false
 };
 
 const PromoUpdateSchema: JSONSchemaType<IPromoUpdate> = {
     type: "object",
     properties: {
-        name: {type: "string", nullable: false }
+        promo: { type: "string", nullable: true },
+        user_id: { type: "number"}
     },
     required: [],
     additionalProperties: false

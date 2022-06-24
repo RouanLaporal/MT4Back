@@ -25,15 +25,8 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
     authorization,
     async (request: Request, response: Response, next: NextFunction) => {
         try {
-            // retrieve Authorization token
-            let token = ''
-            if (request.headers.authorization) {
-                token = request.headers.authorization.split(' ')[1];
-            }
-
-            // decode token & retrieve promo in body request
-            const decodeToken = jwt.decode(token)
-            const { user_id } = decodeToken
+            // retrieve user_id in response & promo in body request
+            const { user_id } = response.locals
             let promo = request.body
             promo = { ...promo, user_id }
 
@@ -56,15 +49,8 @@ routerSimple.get<{}, {}, IPromoRO>('/',
     authorization,
     async (request: Request, response: Response, next: NextFunction) => {
         try {
-            // retrieve Authorization token
-            let token = ''
-            if (request.headers.authorization) {
-                token = request.headers.authorization.split(' ')[1];
-            }
-
-            // decode token & retrieve page/limit in body request
-            const decodeToken = jwt.decode(token)
-            const { user_id } = decodeToken
+            // retrieve user_id in response & page/limit in body request
+            const { user_id } = response.locals
             const { page = 0, limit = 20 } = request.query
             const startData = Number(page) * Number(limit)
 

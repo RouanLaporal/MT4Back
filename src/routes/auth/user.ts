@@ -106,16 +106,8 @@ routerIndex.post<{}, {}, IUserCreate>('/',
 
 routerSimple.post('/verification-code', authorization, async (request: Request, response: Response, next: NextFunction) => {
   try {
-
-    // retrieve Authorization token
-    let token = ''
-    if (request.headers.authorization) {
-      token = request.headers.authorization.split(' ')[1];
-    }
-
-    // decode token & retrieve code in body request
-    const decodeToken = jwt.decode(token)
-    const { user_id } = decodeToken
+    // retrieve user_id in response & code in body request
+    const { user_id } = response.locals
     const code = request.body
 
     // recovery code to validate account user

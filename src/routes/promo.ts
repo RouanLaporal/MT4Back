@@ -4,6 +4,8 @@ import { IPromoCreate, IPromoUpdate, IPromoRO, IPromo } from '../types/tables/pr
 import { PromoCreateValidator, PromoUpdateValidator } from "../types/tables/promo/promo.validator";
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { DB } from '../classes/DB';
+import { authorization } from '../middleware/authorization';
+const jwt = require('jsonwebtoken');
 
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
@@ -20,13 +22,19 @@ export const ROUTES_CRUD = CrudRouter<IPromoRO, IPromoCreate, IPromoUpdate>({
 });
 
 routerSimple.post<{}, {}, IPromoCreate>('/', 
+    authorization,
     async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const promo = request.body
+            // retrieve user_id in response & promo in body request
+            const { user_id } = response.locals
+            let promo = request.body
+            promo = { ...promo, user_id }
 
+            // insert new promo in table
             const db = DB.Connection
             const data = await db.query<OkPacket>("insert into promo set ?", promo)
 
+            // return new promo in response
             response.json({
                 promo_id: data[0].insertId,
                 name: promo.promo
@@ -38,15 +46,20 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
 )
 
 routerSimple.get<{}, {}, IPromoRO>('/', 
+    authorization,
     async (request: Request, response: Response, next: NextFunction) => {
         try {
+            // retrieve user_id in response & page/limit in body request
+            const { user_id } = response.locals
             const { page = 0, limit = 20 } = request.query
             const startData = Number(page) * Number(limit)
 
+            // recovery total promo from user & promo depending on the settings
             const db = DB.Connection
-            const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from promo")
-            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from promo limit ?, ?", [startData,Number(limit)])
+            const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from promo where user_id = ?", user_id)
+            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from promo where user_id = ? limit ?, ?", [user_id, startData,Number(limit)])
 
+            // return total & promos in response
             response.json({
                 promos: data[0],
                 total: total[0][0].countPromo
@@ -58,18 +71,19 @@ routerSimple.get<{}, {}, IPromoRO>('/',
 )
 
 routerSimple.put<{}, {}, IPromoUpdate>('/:id',
+    authorization,
     async (request: Request, response: Response, next: NextFunction) => {
         try {
+            // retrieve info promo 
             const { id } = request.params
             const promo = request.body
 
+            // update promo in table
             const db = DB.Connection
             const data = await db.query<OkPacket>("update promo set promo = ? where promo_id = ?", [promo, id])
 
-            response.json({
-                id,
-                name: promo.promo
-            })
+            // return true in response
+            response.json(true)
         } catch (error) {
             next(error)
         }
@@ -77,16 +91,18 @@ routerSimple.put<{}, {}, IPromoUpdate>('/:id',
 )
 
 routerSimple.delete<{}, {}, IPromo>('/:id', 
+    authorization,
     async (request: Request, response: Response, next: NextFunction) => {
         try {
+            // retrieve promo_id in params request
             const { id } = request.params
 
+            // delete promo in table
             const db = DB.Connection
-            const data = await db.query<OkPacket>("delete from promo where promo_id = ?", id)
+            await db.query<OkPacket>("delete from promo where promo_id = ?", id)
 
-            response.json({
-                id
-            })
+            // return true in response
+            response.json(true)
         } catch (error) {
             next(error)
         }

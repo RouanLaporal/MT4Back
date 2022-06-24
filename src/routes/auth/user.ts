@@ -32,14 +32,18 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   validationEmail(),
   validationPassword(),
   async (request, response, next: NextFunction) => {
-
     try {
+
+      // retrieve user info in body request
       let user = request.body;
       user.password = bcrypt.hashSync(user.password, 10);
+      user = { ...user, role_id: 1 }
+
+      // insert new user in table 
       const db = DB.Connection;
-      user = { ...user, roleId: 1 }
       const data = await db.query<OkPacket>("insert into user set ?", user);
-      const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+
+      // generate a unique code & insert in table 
       const unique_code = generateUniqueId({
         length: 5,
         useLetters: false
@@ -51,6 +55,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
       }
       await db.query<OkPacket>("insert into validation set ?", validation);
 
+      // send mail with code
       const mailjet = require('node-mailjet')
         .connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
       const mj_request = mailjet
@@ -65,7 +70,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
               "To": [
                 {
                   "Email": user.email,
-                  "Name": user.firstName
+                  "Name": user.first_name
                 }
               ],
               "Subject": "Verification Code",
@@ -81,32 +86,44 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         .catch((err: any) => {
           console.log(err.statusCode)
         })
-      response.header('Authorization', jwt.sign({ user_id: data[0].insertId, }, privateKey, { algorithm: 'RS256' }));
-      response.redirect('http://localhost:5050/auth/user/verification-code/' + data[0].insertId)
-      next();
 
+      // return token in response
+      const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+      response.status(200).json({
+        token: jwt.sign({
+          user_id: data[0].insertId,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          avatar: null,
+          email: user.email,
+        }, privateKey, { algorithm: 'RS256' })
+      })
     } catch (err: any) {
       next(err);
     }
-
   }
 );
 
-routerSimple.post('/verification-code/:id', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/verification-code', authorization, async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const { id } = request.params
+    // retrieve user_id in response & code in body request
+    const { user_id } = response.locals
     const code = request.body
 
+    // recovery code to validate account user
     const db = DB.Connection;
-    const data = await db.query<RowDataPacket[]>("select code from validation where user_id = ?", id);
+    const data = await db.query<RowDataPacket[]>("select code from VALIDATION where user_id = ?", user_id);
 
+    // compare if code is good
     if (Number(data[0][0].code) !== Number(code.code)) {
       return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
     }
 
-    await db.query<OkPacket>("update user set is_valid = true where user_id = ?", id);
-    await db.query<OkPacket>("delete from validation where user_id = ?", id);
+    // update is_valid as true & delete code to validation table
+    await db.query<OkPacket>("update USER set is_valid = true where user_id = ?", user_id);
+    await db.query<OkPacket>("delete from VALIDATION where user_id = ?", user_id);
 
+    // return true response
     response.json(true)
   } catch (error) {
     next(error);

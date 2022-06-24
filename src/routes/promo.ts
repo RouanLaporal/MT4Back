@@ -28,7 +28,7 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
             // retrieve Authorization token
             let token = ''
             if (request.headers.authorization) {
-                token = request.headers.authorization;
+                token = request.headers.authorization.split(' ')[1];
             }
 
             // decode token & retrieve promo in body request
@@ -59,7 +59,7 @@ routerSimple.get<{}, {}, IPromoRO>('/',
             // retrieve Authorization token
             let token = ''
             if (request.headers.authorization) {
-                token = request.headers.authorization;
+                token = request.headers.authorization.split(' ')[1];
             }
 
             // decode token & retrieve page/limit in body request

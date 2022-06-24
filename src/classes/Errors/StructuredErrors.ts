@@ -12,7 +12,7 @@ export type StructuredErrors =
   // Validation
   'validation/invalid-code' |
 
-
+  'ssh/invalid-credentials' |
 
 
   // Default

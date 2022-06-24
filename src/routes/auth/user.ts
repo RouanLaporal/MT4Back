@@ -81,7 +81,6 @@ routerIndex.post<{}, {}, IUserCreate>('/',
           console.log(err.statusCode)
         })
       response.header('Authorization', jwt.sign({ userId: data[0].insertId, }, privateKey, { algorithm: 'RS256' }));
-      response.redirect('http://localhost:5050/auth/user/verification-code/' + data[0].insertId)
       next();
 
     } catch (err: any) {

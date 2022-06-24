@@ -104,7 +104,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   }
 );
 
-routerSimple.post('/verification-code', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/verification-code', authorization, async (request: Request, response: Response, next: NextFunction) => {
   try {
 
     // Retrieve Authorization token

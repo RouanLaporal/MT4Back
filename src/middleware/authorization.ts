@@ -7,7 +7,7 @@ const fs = require('fs');
 export const authorization = async (request: Request, response: Response, next: NextFunction) => {
     try {
         if (request.headers.authorization) {
-            const token = request.headers.authorization.split(' ')[1];
+            const token = request.headers.authorization;
             const publicKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key.pub', 'utf8');
             const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
             response.locals = decodedToken;

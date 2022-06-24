@@ -107,27 +107,27 @@ routerIndex.post<{}, {}, IUserCreate>('/',
 routerSimple.post('/verification-code', authorization, async (request: Request, response: Response, next: NextFunction) => {
   try {
 
-    // Retrieve Authorization token
+    // retrieve Authorization token
     let token = ''
     if (request.headers.authorization) {
-      token = request.headers.authorization;
+      token = request.headers.authorization.split(' ')[1];
     }
 
-    // Decode token & retrieve code in body request
+    // decode token & retrieve code in body request
     const decodeToken = jwt.decode(token)
     const { user_id } = decodeToken
     const code = request.body
 
-    // Recovery code to validate account user
+    // recovery code to validate account user
     const db = DB.Connection;
     const data = await db.query<RowDataPacket[]>("select code from VALIDATION where user_id = ?", user_id);
 
-    // Compare if code is good
+    // compare if code is good
     if (Number(data[0][0].code) !== Number(code.code)) {
       return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
     }
 
-    // Update is_valid as true & delete code to validation table
+    // update is_valid as true & delete code to validation table
     await db.query<OkPacket>("update USER set is_valid = true where user_id = ?", user_id);
     await db.query<OkPacket>("delete from VALIDATION where user_id = ?", user_id);
 

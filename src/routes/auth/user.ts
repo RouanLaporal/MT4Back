@@ -7,6 +7,7 @@ import { DB } from '../../classes/DB';
 import { ICreateResponse } from '../../types/api/ICreateResponse';
 import { IIndexQuery, IIndexResponse } from '../../types/api/IIndexQuery';
 import { ApiError } from '../../classes/Errors/ApiError';
+import { validationEmail, validationPassword } from '../../middleware/validForm';
 import { authorization } from '../../middleware/authorization';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -18,18 +19,18 @@ const routerSimple = Router({ mergeParams: true });
 
 export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
   table: 'user',
-  primaryKey: 'userId',
+  primaryKey: 'user_id',
   operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
-  readColumns: ['userId', 'firstName', 'lastName', 'email', 'roleId', 'avatar', 'password'],
+  readColumns: ['user_id', 'first_name', 'last_name', 'email', 'role_id', 'avatar', 'password'],
   validators: {
     create: UserCreateValidator,
     update: UserUpdateValidator
   }
 });
 
-
-
 routerIndex.post<{}, {}, IUserCreate>('/',
+  validationEmail(),
+  validationPassword(),
   async (request, response, next: NextFunction) => {
 
     try {
@@ -46,7 +47,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
 
       const validation = {
         code: unique_code,
-        userId: data[0].insertId
+        user_id: data[0].insertId
       }
       await db.query<OkPacket>("insert into validation set ?", validation);
 
@@ -80,7 +81,8 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         .catch((err: any) => {
           console.log(err.statusCode)
         })
-      response.header('Authorization', jwt.sign({ userId: data[0].insertId, }, privateKey, { algorithm: 'RS256' }));
+      response.header('Authorization', jwt.sign({ user_id: data[0].insertId, }, privateKey, { algorithm: 'RS256' }));
+      response.redirect('http://localhost:5050/auth/user/verification-code/' + data[0].insertId)
       next();
 
     } catch (err: any) {
@@ -96,14 +98,14 @@ routerSimple.post('/verification-code/:id', async (request: Request, response: R
     const code = request.body
 
     const db = DB.Connection;
-    const data = await db.query<RowDataPacket[]>("select code from validation where userId = ?", id);
+    const data = await db.query<RowDataPacket[]>("select code from validation where user_id = ?", id);
 
     if (Number(data[0][0].code) !== Number(code.code)) {
       return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
     }
 
-    await db.query<OkPacket>("update user set isValid = true where userId = ?", id);
-    await db.query<OkPacket>("delete from validation where userId = ?", id);
+    await db.query<OkPacket>("update user set is_valid = true where user_id = ?", id);
+    await db.query<OkPacket>("delete from validation where user_id = ?", id);
 
     response.json(true)
   } catch (error) {
@@ -129,9 +131,9 @@ routerSimple.post<{}, string, {}>('/login',
         else
           response.status(200).json({
             token: jwt.sign({
-              userId: data[0][0].userId,
-              firstName: data[0][0].firstName,
-              lastName: data[0][0].lastName,
+              user_id: data[0][0].user_id,
+              first_name: data[0][0].first_name,
+              last_name: data[0][0].last_name,
               avatar: null,
               email: data[0][0].email,
             }, privateKey, { algorithm: 'RS256' })
@@ -170,11 +172,11 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
               "To": [
                 {
                   "Email": email,
-                  "Name": data[0][0].firstName
+                  "Name": data[0][0].first_name
                 }
               ],
               "Subject": "Reset Password",
-              "TextPart": `http://localhost:5050/auth/user/reset-password/${data[0][0].userId}`,
+              "TextPart": `http://localhost:5050/auth/user/reset-password/${data[0][0].user_id}`,
               "CustomID": "CodeVerification"
             }
           ]
@@ -190,15 +192,14 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
   }
 })
 
-routerSimple.post('/reset-password/:id', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/reset-password/:id', validationPassword(), async (request: Request, response: Response, next: NextFunction) => {
   try {
     const db = DB.Connection;
     const { id } = request.params;
-    console.log("apres reverse, " + id)
     var password: string = request.body.password;
 
     password = bcrypt.hashSync(password, 10);
-    db.query<OkPacket>("update user set password=? where userId=?", [password, id]);
+    db.query<OkPacket>("update user set password=? where user_id=?", [password, id]);
     response.json(
       "Success"
     )
@@ -207,12 +208,12 @@ routerSimple.post('/reset-password/:id', async (request: Request, response: Resp
   }
 })
 
-routerSimple.post('/change-password', async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/change-password', validationPassword(), async (request: Request, response: Response, next: NextFunction) => {
   try {
     const db = DB.Connection
     const email: string = request.body.email
-    const oldPassword: string = request.body.password
-    var newPassword: string = request.body.newPassword
+    const oldPassword: string = request.body.oldPassword
+    var newPassword: string = request.body.password
     const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
 
     if (!data[0][0]) {

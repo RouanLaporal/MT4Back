@@ -2,9 +2,9 @@ import Express, { json } from "express";
 import { ROUTES_USER } from './routes/auth/user';
 import { DefaultErrorHandler } from './middleware/error-handler';
 import { ROUTES_CHALLENGE } from './routes/challenge';
-import { ROUTES_SCORE } from "./routes/score";
+import { ROUTES_VALIDATION } from "./routes/validation";
 import { ROUTES_PROMO } from './routes/promo';
-import { ROUTES_SSH } from './routes/auth/ssh';
+//import { ROUTES_SSH } from './routes/auth/ssh';
 const { Client } = require('ssh2');
 const { readFileSync } = require('fs');
 const cors = require('cors');
@@ -36,11 +36,11 @@ app.use(json());
 
 app.use('/auth/user', ROUTES_USER);
 
-app.use('/auth/ssh', ROUTES_SSH)
+//app.use('/auth/ssh', ROUTES_SSH)
 
 app.use('/challenge', ROUTES_CHALLENGE);
 
-app.use('/score', ROUTES_SCORE);
+app.use('/validation', ROUTES_VALIDATION);
 
 app.use('/promo', ROUTES_PROMO);
 

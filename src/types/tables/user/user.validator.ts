@@ -6,14 +6,15 @@ import { IUserCreate, IUserUpdate } from './IUser';
 const UserCreateSchema: JSONSchemaType<IUserCreate> = {
   type: "object",
   properties: {
-    firstName: { type: 'string', nullable: true },
-    lastName: { type: 'string', nullable: true },
-    roleId: { type: 'number' },
+    first_name: { type: 'string', nullable: true },
+    last_name: { type: 'string', nullable: true },
+    role_id: { type: 'number', nullable: true },
     email: { type: 'string' },
     avatar: { type: 'string' },
     password: { type: 'string' },
+    is_valid: { type: 'boolean'}
   },
-  required: ["email", "roleId"],
+  required: ["email"],
   additionalProperties: false,
 };
 
@@ -21,13 +22,15 @@ const UserCreateSchema: JSONSchemaType<IUserCreate> = {
 const UserUpdateSchema: JSONSchemaType<IUserUpdate> = {
   type: "object",
   properties: {
-    firstName: { type: 'string', nullable: true },
-    lastName: { type: 'string', nullable: true },
-    roleId: { type: 'number', nullable: true },
+    first_name: { type: 'string', nullable: true },
+    last_name: { type: 'string', nullable: true },
+    role_id: { type: 'number', nullable: true },
     email: { type: 'string', nullable: true },
     avatar: { type: 'string', nullable: true },
     password: { type: 'string', nullable: true },
+    is_valid: { type: 'boolean', nullable: true}
   },
+  required: [],
   additionalProperties: false,
 };
 

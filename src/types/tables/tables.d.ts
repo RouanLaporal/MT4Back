@@ -1,7 +1,7 @@
 export type DbTable =
   'user' |
   'challenge' |
-  'score' |
+  'participation' |
   'promo' |
-  'ssh'
+  'validation'
   ;  

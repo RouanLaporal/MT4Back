@@ -10,9 +10,9 @@ const routerSimple = Router({ mergeParams: true });
 
 export const ROUTES_CRUD = CrudRouter<IPromoRO, IPromoCreate, IPromoUpdate>({
     table: 'promo',
-    primaryKey: 'promoId',
+    primaryKey: 'promo_id',
     operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Create |CrudOperations.Update | CrudOperations.Delete,
-    readColumns: ['promoId', 'name'],
+    readColumns: ['promo_id', 'promo', 'user_id'],
     validators: {
         create: PromoCreateValidator,
         update: PromoUpdateValidator
@@ -22,14 +22,14 @@ export const ROUTES_CRUD = CrudRouter<IPromoRO, IPromoCreate, IPromoUpdate>({
 routerSimple.post<{}, {}, IPromoCreate>('/', 
     async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const name = request.body
+            const promo = request.body
 
             const db = DB.Connection
-            const data = await db.query<OkPacket>("insert into promo set ?", name)
+            const data = await db.query<OkPacket>("insert into promo set ?", promo)
 
             response.json({
-                promoId: data[0].insertId,
-                name: name.name
+                promo_id: data[0].insertId,
+                name: promo.promo
             })
         } catch (error) {
             next(error)
@@ -44,8 +44,8 @@ routerSimple.get<{}, {}, IPromoRO>('/',
             const startData = Number(page) * Number(limit)
 
             const db = DB.Connection
-            const total = await db.query<RowDataPacket[]>("select count(promoId) as countPromo from promo")
-            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promoId, name from promo limit ?, ?", [startData,Number(limit)])
+            const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from promo")
+            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from promo limit ?, ?", [startData,Number(limit)])
 
             response.json({
                 promos: data[0],
@@ -61,14 +61,14 @@ routerSimple.put<{}, {}, IPromoUpdate>('/:id',
     async (request: Request, response: Response, next: NextFunction) => {
         try {
             const { id } = request.params
-            const name = request.body
+            const promo = request.body
 
             const db = DB.Connection
-            const data = await db.query<OkPacket>("update promo set name = ? where promoId = ?", [name, id])
+            const data = await db.query<OkPacket>("update promo set promo = ? where promo_id = ?", [promo, id])
 
             response.json({
                 id,
-                name: name.name
+                name: promo.promo
             })
         } catch (error) {
             next(error)
@@ -82,7 +82,7 @@ routerSimple.delete<{}, {}, IPromo>('/:id',
             const { id } = request.params
 
             const db = DB.Connection
-            const data = await db.query<OkPacket>("delete from promo where promoId = ?", id)
+            const data = await db.query<OkPacket>("delete from promo where promo_id = ?", id)
 
             response.json({
                 id

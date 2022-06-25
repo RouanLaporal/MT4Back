@@ -37,7 +37,7 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
             // return new promo in response
             response.json({
                 promo_id: data[0].insertId,
-                name: promo.promo
+                promo: promo.promo
             })
         } catch (error) {
             next(error)

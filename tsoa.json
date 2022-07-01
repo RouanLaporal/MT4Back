@@ -15,6 +15,7 @@
     }
   },
   "routes": {
-    "routesDir": "./src/routes"
+    "routesDir": "./src/routes",
+    "authenticationModule": "./src/routes/auth/authentication.ts"
   }
 }

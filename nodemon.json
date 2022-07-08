@@ -1,0 +1,7 @@
+{
+    "exec": "npm run swagger && ts-node src/api.ts",
+    "watch": ["src"],
+    "ignore": ["src/routes/routes.ts"],
+    "ext": "ts"
+  }
+  

@@ -1,0 +1,21 @@
+{
+  "entryFile": "src/api.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["src/routes/**/*Controller.ts"],
+  "spec": {
+    "outputDirectory": "./public",
+    "specVersion": 3,
+    "securityDefinitions": {
+      "jwt": {
+        "type": "apiKey",
+        "name": "jwt",
+        "in": "header",
+        "authorizationUrl": "http://swagger.io/api/oauth/dialog"
+      }
+    }
+  },
+  "routes": {
+    "routesDir": "./src/routes",
+    "authenticationModule": "./src/routes/auth/authentication.ts"
+  }
+}

@@ -10,6 +10,7 @@ export type StructuredErrors =
   'auth/invalid-credentials' |
   'auth/invalid-password-format' |
   'auth/invalid-email-format' |
+  'auth/missing-header' |
 
   // Validation
   'validation/invalid-code' |

@@ -5,6 +5,8 @@ import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_VALIDATION } from "./routes/validation";
 import { ROUTES_PROMO } from './routes/promo';
 //import { ROUTES_SSH } from './routes/auth/ssh';
+import { RegisterRoutes } from './routes/routes';
+import swaggerUi from "swagger-ui-express";
 const { Client } = require('ssh2');
 const { readFileSync } = require('fs');
 const cors = require('cors');
@@ -52,6 +54,19 @@ app.use((req, res, next) => {
 // });
 // L'appli parse le corps du message entrant comme du json
 app.use(json());
+
+RegisterRoutes(app);
+
+app.use(Express.static("public"));
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(undefined, {
+    swaggerOptions: {
+      url: "/swagger.json",
+    },
+  })
+);
 
 app.use('/auth/user', ROUTES_USER);
 

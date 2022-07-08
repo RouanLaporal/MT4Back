@@ -92,10 +92,6 @@ routerIndex.post<{}, {}, IUserCreate>('/',
       response.status(200).json({
         token: jwt.sign({
           user_id: data[0].insertId,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          avatar: null,
-          email: user.email,
         }, privateKey, { algorithm: 'RS256' })
       })
     } catch (err: any) {

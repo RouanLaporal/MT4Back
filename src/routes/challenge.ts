@@ -6,18 +6,10 @@ import { DB } from '../classes/DB';
 import { NextFunction, request, Request, Response, Router } from 'express';
 import { authorization } from '../middleware/authorization';
 
-const routerIndex = Router({ mergeParams: true });
-const routerSimple = Router({ mergeParams: true });
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
-
-
-
-
-export const ROUTES_RUD = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeUpdate>({
-  table: 'challenge',
+export const ROUTES_CHALLENGE = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeUpdate>({
+  table: 'CHALLENGE',
   primaryKey: 'challenge_id',
-  operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
+  operations: CrudOperations.Index | CrudOperations.Create | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
   readColumns: ['challenge_id', 'challenge', 'user_id'],
   validators: {
     create: ChallengeCreateValidator,

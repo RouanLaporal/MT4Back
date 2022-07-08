@@ -18,7 +18,7 @@ const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
 
 export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
-  table: 'user',
+  table: 'USER',
   primaryKey: 'user_id',
   operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
   readColumns: ['user_id', 'first_name', 'last_name', 'email', 'role_id', 'avatar', 'password'],
@@ -41,7 +41,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
 
       // insert new user in table 
       const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into user set ?", user);
+      const data = await db.query<OkPacket>("insert into USER set ?", user);
 
       // generate a unique code & insert in table 
       const unique_code = generateUniqueId({
@@ -53,7 +53,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         code: unique_code,
         user_id: data[0].insertId
       }
-      await db.query<OkPacket>("insert into validation set ?", validation);
+      await db.query<OkPacket>("insert into VALIDATION set ?", validation);
 
       // send mail with code
       const mailjet = require('node-mailjet')
@@ -65,7 +65,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
             {
               "From": {
                 "Email": "rouan.laporal@outlook.com",
-                "Name": "Rouan"
+                "Name": "Challenge"
               },
               "To": [
                 {
@@ -92,10 +92,6 @@ routerIndex.post<{}, {}, IUserCreate>('/',
       response.status(200).json({
         token: jwt.sign({
           user_id: data[0].insertId,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          avatar: null,
-          email: user.email,
         }, privateKey, { algorithm: 'RS256' })
       })
     } catch (err: any) {
@@ -136,7 +132,7 @@ routerSimple.post<{}, string, {}>('/login',
       const db = DB.Connection
       const email: string = request.body.email
       const password: string = request.body.password
-      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USER where email = ?", email);
       var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
       if (!data[0][0]) {
@@ -166,7 +162,7 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
   try {
     const db = DB.Connection;
     const email: string = request.body.email;
-    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USER where email = ?", email);
 
     if (!data[0][0]) {
       next(new ApiError(403, 'auth/invalid-credentials', 'User not found'));
@@ -216,7 +212,7 @@ routerSimple.post('/reset-password/:id', validationPassword(), async (request: R
     var password: string = request.body.password;
 
     password = bcrypt.hashSync(password, 10);
-    db.query<OkPacket>("update user set password=? where user_id=?", [password, id]);
+    db.query<OkPacket>("update USER set password=? where user_id=?", [password, id]);
     response.json(
       "Success"
     )
@@ -231,7 +227,7 @@ routerSimple.post('/change-password', validationPassword(), async (request: Requ
     const email: string = request.body.email
     const oldPassword: string = request.body.oldPassword
     var newPassword: string = request.body.password
-    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from user where email = ?", email);
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USER where email = ?", email);
 
     if (!data[0][0]) {
       next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))
@@ -241,7 +237,7 @@ routerSimple.post('/change-password', validationPassword(), async (request: Requ
         next(new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
       } else {
         newPassword = bcrypt.hashSync(newPassword, 10)
-        db.query<OkPacket>('update user set password = ? where email = ?', [newPassword, email])
+        db.query<OkPacket>('update USERS set password = ? where email = ?', [newPassword, email])
         response.status(200).json(
           true
         )

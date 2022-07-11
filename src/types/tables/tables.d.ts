@@ -1,6 +1,6 @@
 export type DbTable =
-  'user' |
-  'challenge' |
+  'USER' |
+  'CHALLENGE' |
   'participation' |
   'promo' |
   'validation'

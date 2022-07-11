@@ -76,7 +76,7 @@ routerSimple.put<{}, {}, IPromoUpdate>('/:id',
         try {
             // retrieve info promo 
             const { id } = request.params
-            const promo = request.body
+            const { promo } = request.body
 
             // update promo in table
             const db = DB.Connection

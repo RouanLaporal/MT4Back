@@ -193,7 +193,7 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
                 }
               ],
               "Subject": "Reset Password",
-              "TextPart": `http://localhost:5050/auth/user/reset-password/${data[0][0].user_id}`,
+              "TextPart": `${process.env.BASE_URL_FRONT}/reset-password/${data[0][0].user_id}`,
               "CustomID": "CodeVerification"
             }
           ]

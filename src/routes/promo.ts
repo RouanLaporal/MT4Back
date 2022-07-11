@@ -71,7 +71,7 @@ routerSimple.get<{}, {}, IPromoRO>('/',
 )
 
 routerSimple.put<{}, {}, IPromoUpdate>('/:id',
-    authorization,
+    authorization('professor'),
     async (request: Request, response: Response, next: NextFunction) => {
         try {
             // retrieve info promo 
@@ -91,7 +91,7 @@ routerSimple.put<{}, {}, IPromoUpdate>('/:id',
 )
 
 routerSimple.delete<{}, {}, IPromo>('/:id',
-    authorization,
+    authorization('professor'),
     async (request: Request, response: Response, next: NextFunction) => {
         try {
             // retrieve promo_id in params request

@@ -104,7 +104,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   }
 );
 
-routerSimple.post('/verification-code', authorization, async (request: Request, response: Response, next: NextFunction) => {
+routerSimple.post('/verification-code', authorization('professor'), async (request: Request, response: Response, next: NextFunction) => {
   try {
     // retrieve user_id in response & code in body request
     const { user_id } = response.locals

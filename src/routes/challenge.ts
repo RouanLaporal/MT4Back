@@ -5,12 +5,21 @@ import { OkPacket, RowDataPacket } from 'mysql2';
 import { DB } from '../classes/DB';
 import { NextFunction, request, Request, Response, Router } from 'express';
 import { authorization } from '../middleware/authorization';
+import { SGBDRInstance } from '../classes/SGBDRInstance';
 
-export const ROUTES_CHALLENGE = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeUpdate>({
+const routerIndex = Router({ mergeParams: true });
+const routerSimple = Router({ mergeParams: true });
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
+
+
+
+
+export const ROUTES_RUD = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeUpdate>({
   table: 'CHALLENGE',
   primaryKey: 'challenge_id',
-  operations: CrudOperations.Index | CrudOperations.Create | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
-  readColumns: ['challenge_id', 'challenge', 'user_id'],
+  operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
+  readColumns: ['challenge_id', 'challenge', 'is_active'],
   validators: {
     create: ChallengeCreateValidator,
     update: ChallengeUpdateValidator
@@ -23,21 +32,25 @@ routerIndex.post<{}, {}>('/', authorization,
   async (request, response, next: NextFunction) => {
     try {
 
-      // retrieve user info in body request
-      let challenge = request.body;
+
+      let challenge = {
+        challenge: request.body.challenge,
+        is_active: request.body.is_active,
+      }
 
 
       // insert new user in table 
       const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into challenge set ?", challenge);
+      const data = await db.query<OkPacket>("insert into CHALLENGE set ?", challenge);
       var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
 
       response.status(200).json({
         url: `http://localhost:5050/challenge/evaluation/${jwt.sign({
           challenge_id: data[0].insertId,
-          promo_id: challenge.promo_id
-        }, privateKey, { algorithm: 'RS256' })}`
+          promo_id: request.body.promo_id
+        }, privateKey, { algorithm: 'RS256' })}`,
+        challenge: request.body.challenge,
       })
     } catch (error) {
       next(error);
@@ -45,24 +58,42 @@ routerIndex.post<{}, {}>('/', authorization,
   }
 )
 
-routerSimple.post<{}, {}>('/evaluation/:token', authorization,
+routerSimple.post<{ token: string }>('/evaluation/:token',
   async (request, response, next: NextFunction) => {
-    let user = request.body;
-    user = { ...user, role_id: 2 }
+    let email = request.body;
+    email = { ...email, role_id: 2, is_valid: true }
+    const { token } = request.params;
+
+    const publicKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key.pub', 'utf8');
+    const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
 
     // insert new user in table 
     const db = DB.Connection;
-    const data = await db.query<OkPacket>("insert into user set ?", user);
-    const score = await db.query<OkPacket>("insert into score set ?", 0);
-    let challenge_user = {
-      challenge_id: response.locals.challenge_id,
+    const data = await db.query<OkPacket>("insert into USER set ?", email);
+    let participation = {
+      challenge_id: decodedToken.challenge_id,
       user_id: data[0].insertId,
-      promo_id: response.locals.promo_id,
-      score_id: score[0].insertId,
+      promo_id: decodedToken.promo_id,
+      score: 0,
     }
-    await db.query<OkPacket>("insert into challenge_user", challenge_user);
+    await db.query<OkPacket>("insert into PARTICIPATON set ?", participation);
+
+    const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_student.key', 'utf8');
+    response.status(200).json({
+      token: jwt.sign({
+        user_id: data[0].insertId,
+      }, privateKey, { algorithm: 'RS256' })
+    })
+
   }
 )
+
+routerSimple.post('evaluation/SGBDR',
+  async (request, response, next: NextFunction) => {
+    let instance = request.body;
+    let connection = new SGBDRInstance(instance.address_ip, instance.user_name, instance.db_password, instance.db_port);
+    await connection.handle("use challenge_SGBDR");
+  })
 
 
 const route_challenge = Router({ mergeParams: true })

@@ -41,7 +41,7 @@ create table if not exists CHALLENGES (
 );
 
 /* PARTICIPATONS */
-create table if not exists PARTICIPATONS (
+create table if not exists PARTICIPATIONS (
   user_id int,
   challenge_id int,
   promo_id int,

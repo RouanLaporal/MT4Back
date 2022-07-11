@@ -36,6 +36,8 @@ routerIndex.post<{}, {}, IUserCreate>('/',
 
       // retrieve user info in body request
       let user = request.body;
+      if (!user.password)
+        return next(new ApiError(400, 'auth/missing-password', 'No password Provided'))
       user.password = bcrypt.hashSync(user.password, 10);
       user = { ...user, role_id: 1 }
 

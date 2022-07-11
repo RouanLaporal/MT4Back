@@ -11,6 +11,7 @@ export type StructuredErrors =
   'auth/invalid-password-format' |
   'auth/invalid-email-format' |
   'auth/missing-header' |
+  'auth/missing-password' |
 
   // Validation
   'validation/invalid-code' |

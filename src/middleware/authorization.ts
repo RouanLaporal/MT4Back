@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 const fs = require('fs');
 
-
+//TODO: passer le role à la fonction 
 export const authorization = async (request: Request, response: Response, next: NextFunction) => {
     try {
         if (request.headers.authorization) {

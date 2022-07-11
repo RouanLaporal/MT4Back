@@ -13,9 +13,9 @@ export interface IUser {
   /** Adresse-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur */
   email: string;
   /** Avatar de l'utilisateur */
-  avatar: string;
+  avatar?: string;
   /** Mot de passe de l'utilisateur */
-  password: string;
+  password?: string;
 
   is_valid: boolean;
 }

@@ -12,7 +12,7 @@ create table if not exists USERS (
   lastname varchar(256),
   password varchar(256),
   avatar varchar(256),
-  isValid boolean default false,
+  is_valid boolean default false,
   role_id int,
   foreign key(role_id) references ROLES(role_id) on delete cascade on update cascade
 );

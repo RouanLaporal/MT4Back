@@ -22,7 +22,7 @@ export const ROUTES_CRUD = CrudRouter<IPromoRO, IPromoCreate, IPromoUpdate>({
 });
 
 routerSimple.post<{}, {}, IPromoCreate>('/',
-    authorization,
+    authorization('professor'),
     async (request: Request, response: Response, next: NextFunction) => {
         try {
             // retrieve user_id in response & promo in body request

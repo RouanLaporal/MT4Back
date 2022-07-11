@@ -46,7 +46,7 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
 )
 
 routerSimple.get<{}, {}, IPromoRO>('/',
-    authorization,
+    authorization('professor'),
     async (request: Request, response: Response, next: NextFunction) => {
         try {
             // retrieve user_id in response & page/limit in body request

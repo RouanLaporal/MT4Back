@@ -45,30 +45,30 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
     }
 )
 
-// routerSimple.get<{}, {}, IPromoRO>('/', 
-//     authorization,
-//     async (request: Request, response: Response, next: NextFunction) => {
-//         try {
-//             // retrieve user_id in response & page/limit in body request
-//             const { user_id } = response.locals
-//             const { page = 0, limit = 20 } = request.query
-//             const startData = Number(page) * Number(limit)
+routerSimple.get<{}, {}, IPromoRO>('/',
+    authorization,
+    async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            // retrieve user_id in response & page/limit in body request
+            const { user_id } = response.locals
+            const { page = 0, limit = 20 } = request.query
+            const startData = Number(page) * Number(limit)
 
-//             // recovery total promo from user & promo depending on the settings
-//             const db = DB.Connection
-//             const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from promo where user_id = ?", user_id)
-//             const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from promo where user_id = ? limit ?, ?", [user_id, startData,Number(limit)])
+            // recovery total promo from user & promo depending on the settings
+            const db = DB.Connection
+            const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from promo where user_id = ?", user_id)
+            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from promo where user_id = ? limit ?, ?", [user_id, startData, Number(limit)])
 
-//             // return total & promos in response
-//             response.json({
-//                 promos: data[0],
-//                 total: total[0][0].countPromo
-//             })
-//         } catch (error) {
-//             next(error)
-//         }
-//     }
-// )
+            // return total & promos in response
+            response.json({
+                promos: data[0],
+                total: total[0][0].countPromo
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+)
 
 routerSimple.put<{}, {}, IPromoUpdate>('/:id',
     authorization,
@@ -110,7 +110,7 @@ routerSimple.delete<{}, {}, IPromo>('/:id',
 )
 
 const route_promo = Router({ mergeParams: true })
-route_promo.use(ROUTES_CRUD);
+// route_promo.use(ROUTES_CRUD);
 route_promo.use(routerIndex);
 route_promo.use(routerSimple);
 

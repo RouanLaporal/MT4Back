@@ -18,6 +18,8 @@ export type StructuredErrors =
   'validation/invalid-password' |
   'validation/invalid-email' |
 
+  //Challenge
+  'challenge/not-active' |
 
   // Default
   'internal/unknown'

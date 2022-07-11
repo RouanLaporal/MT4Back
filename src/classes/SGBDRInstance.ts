@@ -1,4 +1,7 @@
 import { Request, Response, NextFunction, request } from 'express';
+import { DB } from '../classes/DB';
+import { OkPacket, RowDataPacket } from 'mysql2';
+
 import mysql from 'mysql2';
 
 const { Client } = require('ssh2');
@@ -15,12 +18,18 @@ export class SGBDRInstance {
 
 
     public getAddressIp(): string {
-        return this.address_ip
+        return this.address_ip;
     }
 
 
     public getUserName(): string {
-        return this.user_name
+        return this.user_name;
+    }
+    public getDbPort(): number {
+        return this.db_port;
+    }
+    public getDbPassword(): string {
+        return this.db_password;
     }
 
     public setAddressIp(address_ip: string) {
@@ -31,24 +40,24 @@ export class SGBDRInstance {
         this.user_name = user_name;
     }
 
-    public async handle(query: string) {
+    public async handle(query: string, hint: string, response: Response, user_id: number) {
         try {
-
+            const db = DB.Connection;
             const dbServer = {
                 host: '127.0.0.1',
-                port: 5001,
+                port: this.getDbPort(),
                 user: this.getUserName(),
-                password: 'test_mdp',
+                password: this.getDbPassword(),
                 database: 'challenge_SGBDR',
             }
             var config = {
-                username: this.getUserName(),
+                username: 'root',
                 host: this.getAddressIp(),
                 privateKey: readFileSync('/root/.ssh/id_rsa'),
                 port: 22,
-                dstPort: 5001,
+                dstPort: this.getDbPort(),
                 localHost: '127.0.0.1',
-                localPort: 5001
+                localPort: this.getDbPort()
             };
             await new Promise((resolve, reject) => {
                 tunnel(config, function (error: any, server: any) {
@@ -61,15 +70,19 @@ export class SGBDRInstance {
                     const connection = mysql.createConnection(dbServer);
                     connection.on('error', (error: any) => { reject(error); });
                     connection.connect((error) => {
-                        if (error) throw error;
+                        if (error) response.status(200).json({
+                            status: "error",
+                            hint: hint
+                        });
                         console.log('Mysql connected as id ' + connection.threadId);
                         connection.query(query);
+                        connection.end();
                         resolve(connection);
                     })
                 });
 
-
             });
+            await db.query<OkPacket>("update PARTICIPATON set score = ? where user_id = ?", [1, user_id]);
         } catch (error) {
             throw error;
         }

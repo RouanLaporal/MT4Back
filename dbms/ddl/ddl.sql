@@ -8,8 +8,8 @@ create table if not exists ROLES (
 create table if not exists USERS (
   user_id int auto_increment not null primary key,
   email varchar(256) unique not null,
-  firtname varchar(256),
-  lastname varchar(256),
+  first_name varchar(256),
+  last_name varchar(256),
   password varchar(256),
   avatar varchar(256),
   is_valid boolean default false,
@@ -37,7 +37,11 @@ create table if not exists PROMOS (
 create table if not exists CHALLENGES (
   challenge_id int auto_increment not null primary key,
   challenge varchar(256),
-  isActive boolean default true
+  is_active boolean default true,
+  user_id int not null,
+  promo_id int not null,
+  foreign key(promo_id) references PROMOS(promo_id) on delete cascade on update cascade,
+  foreign key(user_id) references USERS(user_id) on delete cascade on update cascade
 );
 
 /* PARTICIPATONS */
@@ -48,7 +52,7 @@ create table if not exists PARTICIPATIONS (
   score int,
   foreign key(user_id) references USERS(user_id) on delete cascade on update cascade,
   foreign key(challenge_id) references CHALLENGES(challenge_id) on delete cascade on update cascade,
-  foreign key(promo_id) references PROMOS(promo_id) on delete cascade on update cascade,
+  foreign key(promo_id) references PROMOS(promo_id) on delete cascade on update cascade
 );
 
 

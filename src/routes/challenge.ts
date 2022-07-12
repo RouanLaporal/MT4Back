@@ -6,7 +6,6 @@ import { DB } from '../classes/DB';
 import { NextFunction, request, Request, Response, Router } from 'express';
 import { authorization } from '../middleware/authorization';
 import { SGBDRInstance } from '../classes/SGBDRInstance';
-import router from '../../front/front-challenge/src/router';
 import { ApiError } from '../classes/Errors/ApiError';
 
 const routerIndex = Router({ mergeParams: true });
@@ -18,7 +17,7 @@ const fs = require('fs');
 
 
 export const ROUTES_RUD = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeUpdate>({
-  table: 'CHALLENGE',
+  table: 'CHALLENGES',
   primaryKey: 'challenge_id',
   operations: CrudOperations.Update | CrudOperations.Delete,
   readColumns: ['challenge_id', 'challenge', 'is_active'],
@@ -32,7 +31,10 @@ routerIndex.get('/', authorization('professor'),
   async (request: Request, response: Response, next: NextFunction) => {
     const db = DB.Connection;
     const { user_id } = response.locals
-    const data = await db.query<RowDataPacket[]>("select * from CHALLENGE where user_id = ?", user_id);
+    const data = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from CHALLENGE where user_id = ?", user_id);
+    return {
+      rows: data[0]
+    }
   })
 
 

@@ -18,7 +18,7 @@ const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
 
 export const route_RUD = CrudRouter<IUserRO, IUserCreate, IUserUpdate>({
-  table: 'USER',
+  table: 'USERS',
   primaryKey: 'user_id',
   operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Update | CrudOperations.Delete,
   readColumns: ['user_id', 'first_name', 'last_name', 'email', 'role_id', 'avatar', 'password'],
@@ -43,7 +43,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
 
       // insert new user in table 
       const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into USER set ?", user);
+      const data = await db.query<OkPacket>("insert into USERS set ?", user);
 
       // generate a unique code & insert in table 
       const unique_code = generateUniqueId({
@@ -55,7 +55,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         code: unique_code,
         user_id: data[0].insertId
       }
-      await db.query<OkPacket>("insert into VALIDATION set ?", validation);
+      await db.query<OkPacket>("insert into VALIDATIONS set ?", validation);
 
       // send mail with code
       const mailjet = require('node-mailjet')
@@ -110,7 +110,7 @@ routerSimple.post('/verification-code', authorization('professor'), async (reque
 
     // recovery code to validate account user
     const db = DB.Connection;
-    const data = await db.query<RowDataPacket[]>("select code from VALIDATION where user_id = ?", user_id);
+    const data = await db.query<RowDataPacket[]>("select code from VALIDATIONS where user_id = ?", user_id);
 
     // compare if code is good
     if (Number(data[0][0].code) !== Number(code.code)) {
@@ -118,8 +118,8 @@ routerSimple.post('/verification-code', authorization('professor'), async (reque
     }
 
     // update is_valid as true & delete code to validation table
-    await db.query<OkPacket>("update USER set is_valid = true where user_id = ?", user_id);
-    await db.query<OkPacket>("delete from VALIDATION where user_id = ?", user_id);
+    await db.query<OkPacket>("update USERS set is_valid = true where user_id = ?", user_id);
+    await db.query<OkPacket>("delete from VALIDATIONS where user_id = ?", user_id);
 
     // return true response
     response.json(true)
@@ -164,7 +164,7 @@ routerSimple.post('/forget-password', async (request: Request, response: Respons
   try {
     const db = DB.Connection;
     const email: string = request.body.email;
-    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USER where email = ?", email);
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USERS where email = ?", email);
 
     if (!data[0][0]) {
       next(new ApiError(403, 'auth/invalid-credentials', 'User not found'));
@@ -214,7 +214,7 @@ routerSimple.post('/reset-password/:id', validationPassword(), async (request: R
     var password: string = request.body.password;
 
     password = bcrypt.hashSync(password, 10);
-    db.query<OkPacket>("update USER set password=? where user_id=?", [password, id]);
+    db.query<OkPacket>("update USERS set password=? where user_id=?", [password, id]);
     response.json(
       "Success"
     )
@@ -229,7 +229,7 @@ routerSimple.post('/change-password', validationPassword(), async (request: Requ
     const email: string = request.body.email
     const oldPassword: string = request.body.oldPassword
     var newPassword: string = request.body.password
-    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USER where email = ?", email);
+    const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USERS where email = ?", email);
 
     if (!data[0][0]) {
       next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))

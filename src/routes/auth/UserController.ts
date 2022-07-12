@@ -22,11 +22,11 @@ export class UserController {
   @Get()
   public async getUsers(
     /** La page (zéro-index) à récupérer */
-    @Query() page?: string,    
+    @Query() page?: string,
     /** Le nombre d'éléments à récupérer (max 50) */
-    @Query() limit?: string,    
-  ): Promise<IIndexResponse<IUser>> {    
-    return Crud.Index<IUser>({ page, limit }, 'user', READ_COLUMNS);
+    @Query() limit?: string,
+  ): Promise<IIndexResponse<IUser>> {
+    return Crud.Index<IUser>({ page, limit }, 'USERS', READ_COLUMNS);
   }
 
   /**
@@ -36,7 +36,7 @@ export class UserController {
   public async createUser(
     @Body() body: IUserCreate
   ): Promise<ICreateResponse> {
-    return Crud.Create<IUserCreate>(body, 'user');
+    return Crud.Create<IUserCreate>(body, 'USERS');
   }
 
   /**
@@ -46,7 +46,7 @@ export class UserController {
   public async readUser(
     @Path() user_id: number
   ): Promise<IUser> {
-    return Crud.Read<IUser>('user', 'user_id', user_id, READ_COLUMNS);
+    return Crud.Read<IUser>('USERS', 'user_id', user_id, READ_COLUMNS);
   }
 
   /**
@@ -57,9 +57,9 @@ export class UserController {
     @Path() user_id: number,
     @Body() body: IUserUpdate
   ): Promise<IUpdateResponse> {
-    return Crud.Update<IUserUpdate>(body, 'user', 'user_id', user_id);
+    return Crud.Update<IUserUpdate>(body, 'USERS', 'user_id', user_id);
   }
-  
+
   /**
    * Supprimer un utilisateur
    */
@@ -67,7 +67,7 @@ export class UserController {
   public async deleteUser(
     @Path() user_id: number,
   ): Promise<IUpdateResponse> {
-    return Crud.Delete('user', 'user_id', user_id);
+    return Crud.Delete('USERS', 'user_id', user_id);
   }
 
 }

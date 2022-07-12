@@ -10,7 +10,8 @@
     "api": "nodemon --watch 'src' src/api.ts -L",
     "swagger": "tsoa spec-and-routes",
     "clean": "rimraf build",
-    "build": "npm run clean && npm run swagger && tsc && copyfiles public/**/* build/"
+    "build": "tsc",
+    "start-api": "node ./build/api.js"
   },
   "repository": {
     "type": "git",

@@ -80,7 +80,7 @@ routerSimple.put<{}, {}, IPromoUpdate>('/:id',
 
             // update promo in table
             const db = DB.Connection
-            const data = await db.query<OkPacket>("update PROMOS set promo = ? where promo_id = ?", [promo, id])
+            await db.query<OkPacket>("update PROMOS set promo = ? where promo_id = ?", [promo, id])
 
             // return true in response
             response.json(true)

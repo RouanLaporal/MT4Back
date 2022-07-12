@@ -24,7 +24,7 @@ export class UserController {
   @Get()
   public async getUsers(
     /** La page (zéro-index) à récupérer */
-    @Query() page?: string,    
+    @Query() page?: string,
     /** Le nombre d'éléments à récupérer (max 50) */
     @Query() limit?: string,    
   ): Promise<IIndexResponse<IUser>> {    
@@ -61,7 +61,7 @@ export class UserController {
   ): Promise<IUpdateResponse> {
     return Crud.Update<IUserUpdate>(body, 'USERS', 'user_id', user_id);
   }
-  
+
   /**
    * Supprimer un utilisateur
    */

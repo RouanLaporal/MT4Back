@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  stage-dbms:
+    image: mariadb
+    restart: always
+    ports:
+      - "3310:3306"
+    env_file: 
+      - ./dbms/.env.stage
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci",
+    ]
+    volumes:
+      - ./stage/dbms/dbms-data:/var/lib/mysql
+      - ./dbms/mariadb.cnf:/etc/mysql/mariadb.cnf
+      # Pointer vers un dossier qui aura des scripts d'initialisation de notre base
+      - ./dbms/stage-initdb.d:/docker-entrypoint-initdb.d
+      # Ajouter le DDL qui va tourner en dernier
+      - ./dbms/ddl/ddl.sql:/docker-entrypoint-initdb.d/999-ddl.sql
+    networks:
+      - api-stage-network
+   
+
+  stage-api:
+    build: 
+      context: ./
+      dockerfile: ./Dockerfile.prod
+    container_name: api
+    ports:
+      - "5060:5050"
+    environment:
+      - NODE_ENV=prod
+      - PORT=5050
+      - DB_HOST=stage-dbms
+      - DB_USER=api-stage
+      - DB_PASSWORD=api-stage-password
+      - DB_DATABASE=mtdb_stage     
+      - AWS_ACCESS_KEY_ID=SCWTY6B680E3QQ9WM2V5
+      - AWS_SECRET_ACCESS_KEY=18856bfe-8260-4cfd-8802-389f943deccf
+      - STORAGE_REGION=fr-par
+      - STORAGE_ENDPOINT=https://s3.fr-par.scw.cloud
+      - STORAGE_BUCKET=object-storage-playground
+    networks:
+      - api-stage-network
+    restart: always
+    depends_on:
+      - stage-dbms
+  
+networks:
+  api-stage-network:
+    driver: bridge
+  api-stage-logging:
+    driver: bridge

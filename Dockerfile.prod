@@ -1,0 +1,15 @@
+FROM node:18-alpine AS api-builder
+RUN apk --no-cache add g++ gcc libgcc libstdc++ linux-headers make cmake python3
+WORKDIR app
+COPY . .
+RUN npm install
+RUN npm run clean
+RUN npm run build
+
+FROM node:18-alpine AS api
+RUN apk --no-cache add g++ gcc libgcc libstdc++ linux-headers make cmake python3
+WORKDIR app
+COPY --from=api-builder /app/build ./build
+COPY package* ./
+RUN npm install --omit=dev
+CMD npm run start-api

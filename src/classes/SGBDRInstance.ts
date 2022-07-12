@@ -40,7 +40,7 @@ export class SGBDRInstance {
         this.user_name = user_name;
     }
 
-    public async handle(query: string, hint: string, response: Response, user_id: number) {
+    public async handle(query: string, hint: string, response: Response) {
         try {
             const db = DB.Connection;
             const dbServer = {
@@ -82,7 +82,7 @@ export class SGBDRInstance {
                 });
 
             });
-            await db.query<OkPacket>("update PARTICIPATON set score = ? where user_id = ?", [1, user_id]);
+            // await db.query<OkPacket>("update PARTICIPATON set score = ? where user_id = ?", [1, user_id]);
         } catch (error) {
             throw error;
         }

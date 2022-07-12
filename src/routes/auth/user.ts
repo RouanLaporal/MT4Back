@@ -134,7 +134,7 @@ routerSimple.post<{}, string, {}>('/login',
       const db = DB.Connection
       const email: string = request.body.email
       const password: string = request.body.password
-      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USER where email = ?", email);
+      const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USERS where email = ?", email);
       var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
       if (!data[0][0]) {

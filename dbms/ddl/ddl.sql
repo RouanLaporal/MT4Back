@@ -37,9 +37,11 @@ create table if not exists PROMOS (
 create table if not exists CHALLENGES (
   challenge_id int auto_increment not null primary key,
   challenge varchar(256),
+  url varchar(256),
   is_active boolean default true,
   user_id int not null,
   promo_id int not null,
+  
   foreign key(promo_id) references PROMOS(promo_id) on delete cascade on update cascade,
   foreign key(user_id) references USERS(user_id) on delete cascade on update cascade
 );

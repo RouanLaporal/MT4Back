@@ -11,7 +11,7 @@ const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
 
 export const ROUTES_CRUD = CrudRouter<IPromoRO, IPromoCreate, IPromoUpdate>({
-    table: 'promo',
+    table: 'PROMOS',
     primaryKey: 'promo_id',
     operations: CrudOperations.Index | CrudOperations.Read | CrudOperations.Create | CrudOperations.Update | CrudOperations.Delete,
     readColumns: ['promo_id', 'promo', 'user_id'],
@@ -32,7 +32,7 @@ routerSimple.post<{}, {}, IPromoCreate>('/',
 
             // insert new promo in table
             const db = DB.Connection
-            const data = await db.query<OkPacket>("insert into promo set ?", promo)
+            const data = await db.query<OkPacket>("insert into PROMOS set ?", promo)
 
             // return new promo in response
             response.json({
@@ -56,8 +56,8 @@ routerSimple.get<{}, {}, IPromoRO>('/',
 
             // recovery total promo from user & promo depending on the settings
             const db = DB.Connection
-            const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from promo where user_id = ?", user_id)
-            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from promo where user_id = ? limit ?, ?", [user_id, startData, Number(limit)])
+            const total = await db.query<RowDataPacket[]>("select count(promo_id) as countPromo from PROMOS where user_id = ?", user_id)
+            const data = await db.query<IPromoRO[] & RowDataPacket[]>("select promo_id, promo from PROMOS where user_id = ? limit ?, ?", [user_id, startData, Number(limit)])
 
             // return total & promos in response
             response.json({
@@ -80,7 +80,7 @@ routerSimple.put<{}, {}, IPromoUpdate>('/:id',
 
             // update promo in table
             const db = DB.Connection
-            const data = await db.query<OkPacket>("update promo set promo = ? where promo_id = ?", [promo, id])
+            const data = await db.query<OkPacket>("update PROMOS set promo = ? where promo_id = ?", [promo, id])
 
             // return true in response
             response.json(true)
@@ -99,7 +99,7 @@ routerSimple.delete<{}, {}, IPromo>('/:id',
 
             // delete promo in table
             const db = DB.Connection
-            await db.query<OkPacket>("delete from promo where promo_id = ?", id)
+            await db.query<OkPacket>("delete from PROMOS where promo_id = ?", id)
 
             // return true in response
             response.json(true)

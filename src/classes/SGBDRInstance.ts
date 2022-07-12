@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction, request } from 'express';
+import { Request, Response, NextFunction, request, query } from 'express';
 import { DB } from '../classes/DB';
 import { OkPacket, RowDataPacket } from 'mysql2';
 
 import mysql from 'mysql2';
+import { Query } from 'tsoa';
 
 const { Client } = require('ssh2');
 const { readFileSync } = require('fs');
@@ -40,7 +41,7 @@ export class SGBDRInstance {
         this.user_name = user_name;
     }
 
-    public async handle(query: string, hint: string, response: Response) {
+    public async config() {
         try {
             const db = DB.Connection;
             const dbServer = {
@@ -59,7 +60,7 @@ export class SGBDRInstance {
                 localHost: '127.0.0.1',
                 localPort: this.getDbPort()
             };
-            await new Promise((resolve, reject) => {
+            return await new Promise<mysql.Connection>((resolve, reject) => {
                 tunnel(config, function (error: any, server: any) {
                     server.on("error", (error: any) => {
                         reject(error);
@@ -70,13 +71,8 @@ export class SGBDRInstance {
                     const connection = mysql.createConnection(dbServer);
                     connection.on('error', (error: any) => { reject(error); });
                     connection.connect((error) => {
-                        if (error) response.status(200).json({
-                            status: "error",
-                            hint: hint
-                        });
+                        if (error) throw error
                         console.log('Mysql connected as id ' + connection.threadId);
-                        connection.query(query);
-                        connection.end();
                         resolve(connection);
                     })
                 });
@@ -85,6 +81,18 @@ export class SGBDRInstance {
             // await db.query<OkPacket>("update PARTICIPATON set score = ? where user_id = ?", [1, user_id]);
         } catch (error) {
             throw error;
+        }
+    }
+
+    public async execute(
+        connection: Promise<mysql.Connection>,
+        query: string,
+        hint: string
+    ) {
+        try {
+            (await connection).query(query);
+        } catch (error) {
+            throw error
         }
     }
 }

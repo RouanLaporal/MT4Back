@@ -33,10 +33,12 @@ routerIndex.get('/', authorization('professor'),
     const db = DB.Connection;
     const { user_id } = response.locals
     const total = await db.query<RowDataPacket[]>("select count(challenge_id) as countChallenge from CHALLENGES where user_id = ?", user_id)
-    const data = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from CHALLENGES where user_id = ?", user_id);
+    const challenge = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from CHALLENGES where user_id = ?", user_id);
+    const promo = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from PROMOS where user_id = ?", user_id);
     response.json({
-      challenge: data[0],
-      total: total[0][0].countPromo
+      challenge: challenge[0],
+      promo: promo[0],
+      total: total[0][0].countChallenge
     })
   })
 
@@ -53,21 +55,29 @@ routerIndex.post<{}, {}>('/', authorization('professor'),
         promo_id: request.body.promo_id,
         user_id: user_id
       }
-
-
-      // insert new challenge in table 
       const db = DB.Connection;
-      const data = await db.query<OkPacket>("insert into CHALLENGES set ?", challenge);
-      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
-
-      response.status(200).json({
-        url: `http://localhost:5050/challenge/evaluation/${jwt.sign({
+      var challenge_exist = await db.query<RowDataPacket[]>("select count(*) as countChallenge from CHALLENGES where challenge = ? AND promo_id = ? AND user_id = ?", [request.body.challenge, request.body.promo_id, user_id]);
+      if (challenge_exist[0][0].countChallenge > 0)
+        return new ApiError(400, 'challenge/already-exist', 'Ce challenge existe déjà');
+      else {
+        // insert new challenge in table 
+        const data = await db.query<OkPacket>("insert into CHALLENGES set ?", challenge);
+        var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+        const url = `http://localhost:5050/challenge/evaluation/${jwt.sign({
           challenge_id: data[0].insertId,
           promo_id: request.body.promo_id
-        }, privateKey, { algorithm: 'RS256' })}`,
-        challenge: request.body.challenge,
-      })
+        }, privateKey, { algorithm: 'RS256' })}`;
+
+        response.status(200).json({
+          url: `http://localhost:5050/challenge/evaluation/${jwt.sign({
+            challenge_id: data[0].insertId,
+            promo_id: request.body.promo_id,
+            challenge: request.body.challenge
+          }, privateKey, { algorithm: 'RS256' })}`,
+        })
+        await db.query<OkPacket>("update CHALLENGES set url =  ?", url);
+      }
     } catch (error) {
       next(error);
     }
@@ -117,7 +127,7 @@ routerSimple.post('/evaluation/authentification/:token',
                   }
                 ],
                 "Subject": "Lancez votre challenge",
-                "TextPart": `http://localhost:5050/challenge/evaluation/SGBDR/${student_token}`,
+                "TextPart": `<a href = http://localhost:5050/challenge/evaluation/SGBDR/${student_token}>Cliquer sur le lien !</a>`,
                 "CustomID": "Challenge"
               }
             ]
@@ -184,7 +194,6 @@ routerSimple.post('/evaluation/SGBDR/:token', authorization('student'),
         db_port: request.body.db_port
       }
       const connection = new SGBDRInstance(instance.address_ip, instance.user_name, instance.db_password, instance.db_port);
-      await connection.handle("use challenge_SGBDR", "The challenge_SGBDR database does not exist", response);
       response.json({
         "status": "success",
       })
@@ -207,9 +216,14 @@ routerSimple.post('/SGBDR', authorization('student'),
         db_password: request.body.db_password,
         db_port: request.body.db_port
       }
-      const connection = new SGBDRInstance(instance.address_ip, instance.user_name, instance.db_password, instance.db_port);
-      await connection.handle("use challenge_SGBDR", "The challenge_SGBDR database does not exist", response);
-      await connection.handle("INSERT INTO `User` VALUES ('0000f9eb-42cd-452d-beb7-cebf673c0336','Celia_Lind@yahoo.com','Lind','Celia','Territoire de Belfort')", "", response);
+      const ssh_tunnel = new SGBDRInstance(instance.address_ip, instance.user_name, instance.db_password, instance.db_port);
+      const connection = ssh_tunnel.config();
+      ssh_tunnel.execute(connection, "use challenge_SGBDR", "Import the database");
+      ssh_tunnel.execute(connection, "INSERT INTO `User` VALUES ('0000f9eb-42cd-452d-beb7-cebf673c0336','Celia_Lind@yahoo.com','Lind','Celia','Territoire de Belfort')", "- Ne pas avoir la possibilité d’insérer un email déjà existant");
+      response.json({
+        "status": "success",
+      })
+
     } catch (error) {
       next(error)
     }

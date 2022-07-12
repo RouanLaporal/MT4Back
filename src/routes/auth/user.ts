@@ -102,31 +102,30 @@ routerIndex.post<{}, {}, IUserCreate>('/',
   }
 );
 
-routerSimple.post('/verification-code', authorization('professor'), async (request: Request, response: Response, next: NextFunction) => {
-  try {
-    // retrieve user_id in response & code in body request
-    const { user_id } = response.locals
-    const code = request.body
+routerSimple.post('/verification-code', authorization('professor'),
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      // retrieve user_id in response & code in body request
+      const { user_id } = response.locals
+      const { code } = request.body
+      // recovery code to validate account user
+      const db = DB.Connection;
+      const data = await db.query<RowDataPacket[]>("select code from VALIDATIONS where user_id = ?", user_id);
+      // compare if code is good
+      if (Number(data[0][0].code) !== Number(code)) {
+        return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
+      }
 
-    // recovery code to validate account user
-    const db = DB.Connection;
-    const data = await db.query<RowDataPacket[]>("select code from VALIDATIONS where user_id = ?", user_id);
+      // update is_valid as true & delete code to validation table
+      await db.query<OkPacket>("update USERS set is_valid = true where user_id = ?", user_id);
+      await db.query<OkPacket>("delete from VALIDATIONS where user_id = ?", user_id);
 
-    // compare if code is good
-    if (Number(data[0][0].code) !== Number(code.code)) {
-      return next(new ApiError(403, 'validation/invalid-code', 'Invalid code'))
+      // return true response
+      response.json(true)
+    } catch (error) {
+      next(error);
     }
-
-    // update is_valid as true & delete code to validation table
-    await db.query<OkPacket>("update USERS set is_valid = true where user_id = ?", user_id);
-    await db.query<OkPacket>("delete from VALIDATIONS where user_id = ?", user_id);
-
-    // return true response
-    response.json(true)
-  } catch (error) {
-    next(error);
-  }
-})
+  })
 
 routerSimple.post<{}, string, {}>('/login',
   async (request: Request, response: Response, next: NextFunction) => {

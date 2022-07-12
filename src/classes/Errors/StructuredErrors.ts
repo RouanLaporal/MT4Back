@@ -20,6 +20,7 @@ export type StructuredErrors =
 
   //Challenge
   'challenge/not-active' |
+  'challenge/already-exist' |
 
   // Default
   'internal/unknown'

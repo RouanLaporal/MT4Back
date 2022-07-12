@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 var jwt = require('jsonwebtoken');
-var bcrypt = require('bcryptjs');
 const fs = require('fs');
 
 

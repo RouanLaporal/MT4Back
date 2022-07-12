@@ -86,7 +86,8 @@ routerIndex.post<{}, {}>('/', authorization('professor'),
         url,
         challenge_id: data[0].insertId,
         promo: promoName[0][0].promo,
-        challenge: request.body.challenge,
+        challenge: challenge.challenge,
+        is_active: challenge.is_active
       })
     } catch (error) {
       next(error);

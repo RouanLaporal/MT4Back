@@ -64,8 +64,8 @@ routerIndex.post<{}, {}>('/', authorization('professor'),
       // compare if challenge already existing
       const db = DB.Connection;
       var challenge_exist = await db.query<RowDataPacket[]>("select count(*) as countChallenge from CHALLENGES where challenge = ? AND promo_id = ? AND user_id = ?", [request.body.challenge, request.body.promo_id, user_id]);
-      if (challenge_exist[0][0].countChallenge > 0) return new ApiError(400, 'challenge/already-exist', 'Ce challenge existe déjà');
-
+      if (challenge_exist[0][0].countChallenge > 0) next(new ApiError(400, 'challenge/already-exist', 'Ce challenge existe déjà'))
+        
       // insert new challenge in table 
       const data = await db.query<OkPacket>("insert into CHALLENGES set ?", challenge);
       var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');

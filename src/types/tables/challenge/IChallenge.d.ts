@@ -14,6 +14,14 @@ export interface IChallenge {
      * Status du challenge || true or false
      */
     is_active: boolean;
+
+    user_id: number;
+
+    promo_id: number;
+    /**
+     * url du challenge
+     */
+    url: string;
 }
 
 export type IChallengeCreate = Omit<IChallenge, 'challenge_id'>;

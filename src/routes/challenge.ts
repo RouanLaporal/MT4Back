@@ -34,7 +34,7 @@ routerIndex.get('/', authorization('professor'),
     const { user_id } = response.locals
     const total = await db.query<RowDataPacket[]>("select count(challenge_id) as countChallenge from CHALLENGES where user_id = ?", user_id)
     const challenge = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from CHALLENGES where user_id = ?", user_id);
-    const promo = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from PROMOS where user_id = ?", user_id);
+    const promo = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from PROMOS where promo_id = ?", challenge[0][0].promo_id);
     response.json({
       challenge: challenge[0],
       promo: promo[0],

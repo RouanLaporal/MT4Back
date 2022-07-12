@@ -1,4 +1,4 @@
-# Nodejs Boilerplate API
+# Nodejs Manhattan Project API
 
 Ce repo contient des exemples d'une base de projet en NodeJS/Typescript.
 
@@ -29,6 +29,22 @@ npm run api
 
 L'API est accessible à l'adresse : `http://localhost:5050`.
 
+# Pour générer la doc et les routes
+npm run swagger
+
+    # Les fichiers seront crées :
+    # - public/swagger.json
+    # - routes/routes.ts
+
+# Pour compiler une version de déploiement (pas nécessaire pour lancer l'API)
+npm run build
+
+# Pour ouvrir sur une interface web la doc OpenAPI avec Swagger.io
+
+    # Ouvrir le fichier swagger.json
+    # Copier le fichier
+    # Ouvrir sur un navigateur la page : `https://editor.swagger.io/`
+    # Copier dans le champs à gauche le script swagger.json
 
 ## Explications
 

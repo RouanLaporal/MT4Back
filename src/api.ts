@@ -4,6 +4,7 @@ import { DefaultErrorHandler } from './middleware/error-handler';
 import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_VALIDATION } from "./routes/validation";
 import { ROUTES_PROMO } from './routes/promo';
+import { RegisterRoutes } from './routes/routes';
 //import { ROUTES_SSH } from './routes/auth/ssh';
 
 import swaggerUi from "swagger-ui-express";
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 // L'appli parse le corps du message entrant comme du json
 app.use(json());
 
-
+RegisterRoutes(app);
 
 app.use(Express.static("public"));
 app.use(

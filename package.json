@@ -1,7 +1,7 @@
 {
-  "name": "boilerplate-api",
+  "name": "projet-manhattan",
   "version": "1.0.0",
-  "description": "Boilerplate api project with nodejs",
+  "description": "Manhattan api project with nodejs",
   "main": "index.js",
   "directories": {
     "doc": "docs"

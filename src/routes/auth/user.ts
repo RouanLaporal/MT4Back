@@ -90,7 +90,7 @@ routerIndex.post<{}, {}, IUserCreate>('/',
         })
 
       // return token in response
-      const privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+      const privateKey = fs.readFileSync('src/routes/auth/key/jwtRS256_prof.key', 'utf8');
       response.status(200).json({
         token: jwt.sign({
           user_id: data[0].insertId,
@@ -134,7 +134,7 @@ routerSimple.post<{}, string, {}>('/login',
       const email: string = request.body.email
       const password: string = request.body.password
       const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USERS where email = ?", email);
-      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+      var privateKey = fs.readFileSync('src/routes/auth/key/jwtRS256_prof.key', 'utf8');
 
       if (!data[0][0]) {
         next(new ApiError(403, 'auth/invalid-credentials', 'User not found'))

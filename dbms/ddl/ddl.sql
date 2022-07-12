@@ -19,8 +19,7 @@ create table if not exists USERS (
 
 /* VALIDATIONS */
 create table if not exists VALIDATIONS (
-  validation_id int auto_increment not null primary key,
-  code int,
+  code int not null primary key,
   user_id int,
   foreign key(user_id) references USERS(user_id) on delete cascade on update cascade
 );

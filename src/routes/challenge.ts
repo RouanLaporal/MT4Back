@@ -14,9 +14,6 @@ const routerSimple = Router({ mergeParams: true });
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
-
-
-
 export const ROUTES_RUD = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeUpdate>({
   table: 'CHALLENGES',
   primaryKey: 'challenge_id',
@@ -30,24 +27,32 @@ export const ROUTES_RUD = CrudRouter<IChallengeRO, IChallengeCreate, IChallengeU
 
 routerIndex.get('/', authorization('professor'),
   async (request: Request, response: Response, next: NextFunction) => {
-    const db = DB.Connection;
-    const { user_id } = response.locals
-    const total = await db.query<RowDataPacket[]>("select count(challenge_id) as countChallenge from CHALLENGES where user_id = ?", user_id)
-    const challenge = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from CHALLENGES where user_id = ?", user_id);
-    const promo = await db.query<IChallengeRO[] & RowDataPacket[]>("select * from PROMOS where promo_id = ?", challenge[0][0].promo_id);
-    response.json({
-      challenge: challenge[0],
-      promo: promo[0],
-      total: total[0][0].countChallenge
-    })
-  })
+    try {
+      // retrieve user_id in response & page/limit in body request
+      const { user_id } = response.locals
+      const { page = 0, limit = 20 } = request.query
+      const startData = Number(page) * Number(limit)
 
+      // recovery total challenge from user & challenge depending on the settings
+      const db = DB.Connection;
+      const total = await db.query<RowDataPacket[]>("select count(challenge_id) as countChallenge from CHALLENGES where user_id = ?", user_id);
+      const data = await db.query<IChallengeRO[] & RowDataPacket[]>("select challenge_id, challenge, url, is_active, promo from CHALLENGES INNER JOIN PROMOS ON PROMOS.promo_id = CHALLENGES.promo_id where CHALLENGES.user_id = ? limit ?, ?", [user_id, startData, Number(limit)]);
 
+      // return total & promos in response
+      response.json({
+        challenges: data[0],
+        total: total[0][0].countChallenge
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 
 routerIndex.post<{}, {}>('/', authorization('professor'),
   async (request: Request, response: Response, next: NextFunction) => {
     try {
-
+      // retrieve user_id in response & challenge in body request
       const { user_id } = response.locals;
       const challenge = {
         challenge: request.body.challenge,
@@ -55,29 +60,34 @@ routerIndex.post<{}, {}>('/', authorization('professor'),
         promo_id: request.body.promo_id,
         user_id: user_id
       }
+
+      // compare if challenge already existing
       const db = DB.Connection;
-
       var challenge_exist = await db.query<RowDataPacket[]>("select count(*) as countChallenge from CHALLENGES where challenge = ? AND promo_id = ? AND user_id = ?", [request.body.challenge, request.body.promo_id, user_id]);
-      if (challenge_exist[0][0].countChallenge > 0)
-        return new ApiError(400, 'challenge/already-exist', 'Ce challenge existe déjà');
-      else {
-        // insert new challenge in table 
-        const data = await db.query<OkPacket>("insert into CHALLENGES set ?", challenge);
-        var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
-        const url = `http://localhost:5050/challenge/evaluation/${jwt.sign({
-          challenge_id: data[0].insertId,
-          promo_id: request.body.promo_id
-        }, privateKey, { algorithm: 'RS256' })}`;
+      if (challenge_exist[0][0].countChallenge > 0) return new ApiError(400, 'challenge/already-exist', 'Ce challenge existe déjà');
 
-        response.status(200).json({
-          url: `http://localhost:5050/challenge/evaluation/${jwt.sign({
-            challenge_id: data[0].insertId,
-            promo_id: request.body.promo_id,
-            challenge: request.body.challenge
-          }, privateKey, { algorithm: 'RS256' })}`,
-        })
-        await db.query<OkPacket>("update CHALLENGES set url =  ?", url);
-      }
+      // insert new challenge in table 
+      const data = await db.query<OkPacket>("insert into CHALLENGES set ?", challenge);
+      var privateKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+
+      const token = jwt.sign({
+        challenge_id: data[0].insertId,
+        promo_id: request.body.promo_id,
+        challenge: request.body.challenge
+      }, privateKey, { algorithm: 'RS256' })
+
+      const url = `${process.env.BASE_URL_FRONT}/auth/connect/${token}`
+
+      await db.query<OkPacket>("update CHALLENGES set url =  ?", url);
+      const promoName = await db.query<RowDataPacket[]>("select promo from PROMOS where promo_id = ?", request.body.promo_id)
+
+      // return new promo in response
+      response.status(200).json({
+        url,
+        challenge_id: data[0].insertId,
+        promo: promoName[0][0].promo,
+        challenge: request.body.challenge,
+      })
     } catch (error) {
       next(error);
     }
@@ -142,13 +152,21 @@ routerSimple.post('/evaluation/authentification/:token',
 
 )
 
-routerSimple.post('/desactivation/:challenge_id', authorization('professor'),
+routerSimple.put('/disable/:challenge_id', authorization('professor'),
   async (request: Request, response: Response, next: NextFunction) => {
-    const { challenge_id } = request.params;
-    const db = DB.Connection;
-    const data = await db.query<OkPacket>("update CHALLENGE set is_active = 0  where challenge_id =  ? AND  user_id = ?", [challenge_id, response.locals.user_id]);
-    return {
-      rows: data[0].affectedRows
+    try {
+      // retrieve id challenge
+      const { challenge_id } = request.params;
+      const { user_id } = response.locals
+
+      // disable challenge in table
+      const db = DB.Connection;
+      await db.query<OkPacket>("update CHALLENGES set is_active = 0  where challenge_id = ? AND user_id = ?", [challenge_id, user_id]);
+
+      // return true in response
+      response.json(true)
+    } catch (error) {
+      next(error)
     }
   }
 )

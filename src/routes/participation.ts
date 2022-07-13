@@ -8,9 +8,8 @@ import { authorization } from '../middleware/authorization';
 
 const routerIndex = Router({ mergeParams: true });
 const routerSimple = Router({ mergeParams: true });
-const jwt = require('jsonwebtoken');
 
-export const ROUTES_PARTICIPATION = CrudRouter<IParticipationRO, IParticipationCreate, IParticipationUpdate>({
+export const ROUTES_CRUD = CrudRouter<IParticipationRO, IParticipationCreate, IParticipationUpdate>({
     table: 'participation',
     primaryKey: 'participation_id',
     operations: CrudOperations.Index | CrudOperations.Create |CrudOperations.Read |CrudOperations.Update | CrudOperations.Delete,
@@ -21,7 +20,7 @@ export const ROUTES_PARTICIPATION = CrudRouter<IParticipationRO, IParticipationC
     }
 });
 
-routerSimple.get('/allUsersByChallenge',
+routerSimple.get('/allUsersByChallenge/:challenge_id',
     authorization('professor'),
     async (request: Request, response: Response, next: NextFunction) => {
         try {
@@ -30,7 +29,7 @@ routerSimple.get('/allUsersByChallenge',
 
             // recovery total promo from user & promo depending on the settings
             const db = DB.Connection
-            const data = await db.query<IParticipationRO[] & RowDataPacket[]>("select score, challenge, promo, last_name, first_name from PARTICIPATIONS INNER JOIN CHALLENGES INNER JOIN PROMOS INNER JOIN USERS ON USERS.user_id = PROMOS.user_id ON PROMOS.promo_id = CHALLENGES.promo_id ON CHALLENGES.challenge_id = PARTICIPATIONS.challenge_id where PARTICIPATIONS.challenge_id = ?", challenge_id)
+            const data = await db.query<IParticipationRO[] & RowDataPacket[]>("select last_name, first_name, promo, challenge, score from PARTICIPATIONS INNER JOIN CHALLENGES INNER JOIN PROMOS INNER JOIN USERS ON USERS.user_id = PROMOS.user_id ON PROMOS.promo_id = CHALLENGES.promo_id ON CHALLENGES.challenge_id = PARTICIPATIONS.challenge_id where PARTICIPATIONS.challenge_id = ?", challenge_id)
 
             // return total & promos in response
             response.json({
@@ -43,9 +42,9 @@ routerSimple.get('/allUsersByChallenge',
 )
 
 const route_participation = Router({ mergeParams: true })
-route_participation.use(ROUTES_PARTICIPATION);
+// route_participation.use(ROUTES_CRUD);
 route_participation.use(routerIndex);
 route_participation.use(routerSimple);
 
-export const ROUTES_PROMO = route_participation;
+export const ROUTES_PARTICIPATION = route_participation;
 

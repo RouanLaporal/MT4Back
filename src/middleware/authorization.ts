@@ -13,11 +13,11 @@ export const authorization = (userTypes: 'professor' | 'student' | 'admin') => {
                 const token = request.headers.authorization.split(' ')[1];
                 var publicKey;
                 if (userTypes == 'professor') {
-                    publicKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_prof.key.pub', 'utf8');
+                    publicKey = fs.readFileSync('/src/routes/auth/key/jwtRS256_prof.key.pub', 'utf8');
                 } else if (userTypes == 'student') {
-                    publicKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_student.key.pub', 'utf8');
+                    publicKey = fs.readFileSync('/src/routes/auth/key/jwtRS256_student.key.pub', 'utf8');
                 } else {
-                    publicKey = fs.readFileSync('/server/src/routes/auth/key/jwtRS256_admin.key.pub', 'utf8');
+                    publicKey = fs.readFileSync('/src/routes/auth/key/jwtRS256_admin.key.pub', 'utf8');
                 }
                 const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
                 response.locals = decodedToken;

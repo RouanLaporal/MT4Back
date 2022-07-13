@@ -7,12 +7,13 @@ import { authorization } from '../middleware/authorization';
 import { SGBDRInstance } from '../classes/SGBDRInstance';
 import { ApiError } from '../classes/Errors/ApiError';
 import { SshCommand } from '../classes/SshCommand';
+import { response } from 'express';
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 
 export class Challenge {
-    public async getChallengeByUser(page: number, limit: number, user_id: string) {
+    public async getChallengeByUser(page = 0, limit = 20, user_id: string) {
         try {
             // retrieve user_id in response & page/limit in body request
             const startData = Number(page) * Number(limit)

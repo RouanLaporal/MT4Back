@@ -13,11 +13,33 @@ export const authorization = (userTypes: 'professor' | 'student' | 'admin') => {
                 const token = request.headers.authorization.split(' ')[1];
                 var publicKey;
                 if (userTypes == 'professor') {
-                    publicKey = fs.readFileSync('/app/src/routes/auth/key/jwtRS256_prof.key.pub', 'utf8');
+                    switch (process.env.APP_ENV) {
+                        case "local":
+                            publicKey = fs.readFileSync(`${process.env.KEY_PATH_LOCAL}jwtRS256_prof.key.pub`, 'utf8');
+                            break;
+                        case "prod":
+                            publicKey = fs.readFileSync(`${process.env.KEY_PATH_PROD}jwtRS256_prof.key.pub`, 'utf8');
+                            break;
+                    }
+
                 } else if (userTypes == 'student') {
-                    publicKey = fs.readFileSync('/src/routes/auth/key/jwtRS256_student.key.pub', 'utf8');
+                    switch (process.env.APP_ENV) {
+                        case "local":
+                            publicKey = fs.readFileSync(`${process.env.KEY_PATH_LOCAL}jwtRS256_student.key.pub`, 'utf8');
+                            break;
+                        case "prod":
+                            publicKey = fs.readFileSync(`${process.env.KEY_PATH_PROD}jwtRS256_student.key.pub`, 'utf8');
+                            break;
+                    }
                 } else {
-                    publicKey = fs.readFileSync('/src/routes/auth/key/jwtRS256_admin.key.pub', 'utf8');
+                    switch (process.env.APP_ENV) {
+                        case "local":
+                            publicKey = fs.readFileSync(`${process.env.KEY_PATH_LOCAL}jwtRS256_admin.key.pub`, 'utf8');
+                            break;
+                        case "prod":
+                            publicKey = fs.readFileSync(`${process.env.KEY_PATH_PROD}jwtRS256_admin.key.pub`, 'utf8');
+                            break;
+                    }
                 }
                 const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
                 response.locals = decodedToken;

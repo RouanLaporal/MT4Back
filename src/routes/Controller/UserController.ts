@@ -28,7 +28,6 @@ export class UserController extends Controller {
   /**
    * Récupérer une page d'utilisateurs.
    */
-  @Security('jwt')
   @Get()
   public async getUsers(
     /** La page (zéro-index) à récupérer */

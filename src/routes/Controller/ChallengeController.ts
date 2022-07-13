@@ -38,15 +38,16 @@ export class ChallengeController {
 
     @Path() user_id: string,
     /** La page (zéro-index) à récupérer */
-    @Query() page: number,
+    @Query() page?: number,
     /** Le nombre d'éléments à récupérer (max 50) */
-    @Query() limit: number,
+    @Query() limit?: number,
   ): Promise<any> {
     return new Challenge().getChallengeByUser(page, limit, user_id)
   }
   /**
    * Créer un nouveau challenge
    */
+  @Middlewares(authorization('professor'))
   @Post()
   public async createChallenge(
     @Body() body: IChallengeCreate

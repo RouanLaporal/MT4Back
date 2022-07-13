@@ -13,7 +13,7 @@ export const authorization = (userTypes: 'professor' | 'student' | 'admin') => {
                 const token = request.headers.authorization.split(' ')[1];
                 var publicKey;
                 if (userTypes == 'professor') {
-                    publicKey = fs.readFileSync('/app/src/routes/auth/key/jwtRS256_prof.key', 'utf8');
+                    publicKey = fs.readFileSync('/app/src/routes/auth/key/jwtRS256_prof.key.pub', 'utf8');
                 } else if (userTypes == 'student') {
                     publicKey = fs.readFileSync('/src/routes/auth/key/jwtRS256_student.key.pub', 'utf8');
                 } else {

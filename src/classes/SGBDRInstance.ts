@@ -41,7 +41,7 @@ export class SGBDRInstance {
         this.user_name = user_name;
     }
 
-    public async config() {
+    public async config(): Promise<mysql.Connection> {
         try {
             const db = DB.Connection;
             const dbServer = {
@@ -85,7 +85,7 @@ export class SGBDRInstance {
     }
 
     public async execute(
-        connection: Promise<mysql.Connection>,
+        connection: mysql.Connection,
         query: string,
         hint: string
     ) {

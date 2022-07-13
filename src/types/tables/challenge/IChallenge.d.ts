@@ -21,7 +21,7 @@ export interface IChallenge {
     /**
      * url du challenge
      */
-    url: string;
+    url?: string;
 }
 
 export type IChallengeCreate = Omit<IChallenge, 'challenge_id'>;

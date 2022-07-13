@@ -25,7 +25,7 @@ const models: TsoaRoute.Models = {
             "is_active": {"dataType":"boolean","required":true},
             "user_id": {"dataType":"double","required":true},
             "promo_id": {"dataType":"double","required":true},
-            "url": {"dataType":"string","required":true},
+            "url": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -41,17 +41,9 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ICreateResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "token": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_IChallenge.Exclude_keyofIChallenge.challenge_id__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"challenge":{"dataType":"string","required":true},"is_active":{"dataType":"boolean","required":true},"user_id":{"dataType":"double","required":true},"promo_id":{"dataType":"double","required":true},"url":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"challenge":{"dataType":"string","required":true},"is_active":{"dataType":"boolean","required":true},"user_id":{"dataType":"double","required":true},"promo_id":{"dataType":"double","required":true},"url":{"dataType":"string"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_IChallenge.challenge_id_": {
@@ -62,21 +54,6 @@ const models: TsoaRoute.Models = {
     "IChallengeCreate": {
         "dataType": "refAlias",
         "type": {"ref":"Omit_IChallenge.challenge_id_","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_IUser.Exclude_keyofIUser.user_id__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"first_name":{"dataType":"string"},"last_name":{"dataType":"string"},"role_id":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"avatar":{"dataType":"string"},"password":{"dataType":"string","required":true},"is_valid":{"dataType":"boolean"}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_IUser.user_id_": {
-        "dataType": "refAlias",
-        "type": {"ref":"Pick_IUser.Exclude_keyofIUser.user_id__","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "IUserCreate": {
-        "dataType": "refAlias",
-        "type": {"ref":"Omit_IUser.user_id_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Readonly_IInstance_": {
@@ -153,6 +130,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ICreateResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "token": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_IUserCreate.Exclude_keyofIUserCreate.role_id__": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"first_name":{"dataType":"string"},"last_name":{"dataType":"string"},"email":{"dataType":"string","required":true},"avatar":{"dataType":"string"},"password":{"dataType":"string","required":true},"is_valid":{"dataType":"boolean"}},"validators":{}},
@@ -214,12 +199,39 @@ export function RegisterRoutes(app: express.Router) {
     // ###########################################################################################################
         app.get('/challenge',
             ...(fetchMiddlewares<RequestHandler>(ChallengeController)),
+            ...(fetchMiddlewares<RequestHandler>(ChallengeController.prototype.getChallenges)),
+
+            function ChallengeController_getChallenges(request: any, response: any, next: any) {
+            const args = {
+                    page: {"in":"query","name":"page","dataType":"string"},
+                    limit: {"in":"query","name":"limit","dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new ChallengeController();
+
+
+              const promise = controller.getChallenges.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/challenge/:user_id',
+            ...(fetchMiddlewares<RequestHandler>(ChallengeController)),
             ...(fetchMiddlewares<RequestHandler>(ChallengeController.prototype.getChallengesByUser)),
 
             function ChallengeController_getChallengesByUser(request: any, response: any, next: any) {
             const args = {
-                    page: {"in":"query","name":"page","dataType":"string"},
-                    limit: {"in":"query","name":"limit","dataType":"string"},
+                    user_id: {"in":"path","name":"user_id","required":true,"dataType":"string"},
+                    page: {"in":"query","name":"page","required":true,"dataType":"double"},
+                    limit: {"in":"query","name":"limit","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -270,7 +282,7 @@ export function RegisterRoutes(app: express.Router) {
             function ChallengeController_signUpToChallenge(request: any, response: any, next: any) {
             const args = {
                     token: {"in":"path","name":"token","required":true,"dataType":"string"},
-                    body: {"in":"body","name":"body","required":true,"ref":"IUserCreate"},
+                    body: {"in":"body","name":"body","required":true,"dataType":"any"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -289,7 +301,32 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/challenge/desactivation/:challenge_id',
+        app.post('/challenge/connection/test',
+            ...(fetchMiddlewares<RequestHandler>(ChallengeController)),
+            ...(fetchMiddlewares<RequestHandler>(ChallengeController.prototype.testInstanceConnection)),
+
+            function ChallengeController_testInstanceConnection(request: any, response: any, next: any) {
+            const args = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"any"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new ChallengeController();
+
+
+              const promise = controller.testInstanceConnection.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/challenge/disable/:challenge_id',
             ...(fetchMiddlewares<RequestHandler>(ChallengeController)),
             ...(fetchMiddlewares<RequestHandler>(ChallengeController.prototype.desactivateChallenge)),
 
@@ -314,7 +351,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/challenge/evaluation/SGBDR/:token',
+        app.post('/challenge/auth/run-challenge/:token',
             ...(fetchMiddlewares<RequestHandler>(ChallengeController)),
             ...(fetchMiddlewares<RequestHandler>(ChallengeController.prototype.launchChallenge)),
 

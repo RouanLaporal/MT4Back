@@ -170,24 +170,46 @@ export class User {
             const data = await db.query<IUserRO[] & RowDataPacket[]>("select * from USERS where email = ?", email);
             const privateKey = fs.readFileSync('src/routes/auth/key/jwtRS256_prof.key', 'utf8');
             if (!data[0][0]) {
-                throw new ApiError(403, 'auth/invalid-credentials', 'User not found')
+                return new ApiError(403, 'auth/invalid-credentials', 'User not found')
             }
-            bcrypt.compare(password, data[0][0].password).then((res: boolean) => {
-                if (res === false)
-                    throw new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password')
-                else
-                    return {
-                        token: jwt.sign({
-                            user_id: data[0][0].user_id,
-                            first_name: data[0][0].first_name,
-                            last_name: data[0][0].last_name,
-                            avatar: null,
-                            email: data[0][0].email,
-                        }, privateKey, { algorithm: 'RS256' })
-                    }
-            })
+            const match = await bcrypt.compare(password, data[0][0].password);
+            if (match)
+                return {
+                    token: jwt.sign({
+                        user_id: data[0][0].user_id,
+                        first_name: data[0][0].first_name,
+                        last_name: data[0][0].last_name,
+                        avatar: null,
+                        email: data[0][0].email,
+                    }, privateKey, { algorithm: 'RS256' })
+                }
+            else
+                return new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password')
         } catch (err) {
             throw err
+        }
+    }
+
+    public async changePassword(body: any) {
+        try {
+            const db = DB.Connection
+            const email: string = body.email
+            const oldPassword: string = body.oldPassword
+            var newPassword: string = body.newPassword
+            const data = await db.query<IUserRO[] & RowDataPacket[]>("select password from USERS where email = ?", email);
+            console.log(data[0])
+            if (!data[0][0]) {
+                return (new ApiError(403, 'auth/invalid-credentials', 'User not found'))
+            }
+            const match = await bcrypt.compare(oldPassword, data[0][0].password);
+            if (match) {
+                newPassword = bcrypt.hashSync(newPassword, 10)
+                db.query<OkPacket>('update USERS set password = ? where email = ?', [newPassword, email])
+                return true;
+            }
+            return (new ApiError(403, 'auth/invalid-credentials', 'Invalid email or password'))
+        } catch (err) {
+            throw err;
         }
     }
 }

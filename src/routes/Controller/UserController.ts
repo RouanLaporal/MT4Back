@@ -102,6 +102,21 @@ export class UserController extends Controller {
   ): Promise<any> {
     return new User().Login(body)
   }
+  /**
+   * 
+   * @param body request body from user
+   * @returns 
+   */
+  @Middlewares(authorization('professor'))
+  @Middlewares(validationPassword())
+  @Middlewares(validationEmail())
+  @Put('change-password')
+  public async changePassword(
+    @Body() body: IChangePasswordUpdate
+  ): Promise<any> {
+    return new User().changePassword(body);
+  }
+
 
   /**
    * Récupérer un utilisateur avec l'ID passé dans l'URL
@@ -132,15 +147,6 @@ export class UserController extends Controller {
     @Path() user_id: number,
   ): Promise<IUpdateResponse> {
     return Crud.Delete('USERS', 'user_id', user_id);
-  }
-
-
-
-  @Put('change-password')
-  public async changePassword(
-    @Body() body: IChangePasswordUpdate
-  ): Promise<boolean> {
-    return true;
   }
 
 }

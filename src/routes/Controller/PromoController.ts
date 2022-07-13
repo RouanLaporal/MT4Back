@@ -1,9 +1,9 @@
 import { Body, BodyProp, Delete, Get, Middlewares, Path, Post, Put, Query, Route, Security, Tags, UploadedFile } from 'tsoa';
 import { Crud } from '../../classes/Crud';
-import { ICreateResponse } from '../../types/api/ICreateResponse';
-import { IIndexResponse } from '../../types/api/IIndexQuery';
 import { IUpdateResponse } from '../../types/api/IUpdateResponse';
-import { IPromo, IPromoCreate, IPromoUpdate } from '../../types/tables/promo/IPromo';
+import { IPromoCreate, IPromoUpdate } from '../../types/tables/promo/IPromo';
+import { authorization } from '../../middleware/authorization';
+import { Promo } from '../../classes/Promo';
 
 const READ_COLUMNS = ['promo_id', 'promo', 'user_id'];
 
@@ -20,9 +20,12 @@ export class PromoController {
    * 
    */
   @Get()
+  @Middlewares(authorization('professor'))
   public async getPromo(
-  ): Promise<IPromo[]> {
-    return [];
+    @Query('page') page: number,
+    @Query('limit') limit: number
+  ): Promise<any> {
+    return new Promo().getPromo(page, limit, 15)
   }
 
   /**
@@ -31,10 +34,11 @@ export class PromoController {
    * @param body 
    */
   @Post()
+  @Middlewares(authorization('professor'))
   public async createPromo(
     @Body() body: IPromoCreate
-  ): Promise<ICreateResponse> {
-    return Crud.Create<IPromoCreate>(body, 'PROMOS');
+  ): Promise<any> {
+    return new Promo().createPromo(body)
   }
 
   /**
@@ -44,6 +48,7 @@ export class PromoController {
    * @param body 
    */
   @Put('{id}')
+  @Middlewares(authorization('professor'))
   public async updatePromo(
     @Path() id: number,
     @Body() body: IPromoUpdate
@@ -54,9 +59,10 @@ export class PromoController {
   /**
   * Supprimer une promo
   * @param id 
-   * @param body 
+  * @param body 
   */
   @Delete('{id}')
+  @Middlewares(authorization('professor'))
   public async deletePromo(
     @Path() id: number,
   ): Promise<IUpdateResponse> {

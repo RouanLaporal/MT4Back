@@ -21,11 +21,10 @@ export const authorization = (userTypes: 'professor' | 'student' | 'admin') => {
                 }
                 const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
                 response.locals = decodedToken;
+                next();
             } else {
-                throw new ApiError(ErrorCode.Unauthorized, 'auth/missing-header', 'Missing authorization header');
+                next(new ApiError(ErrorCode.Unauthorized, 'auth/missing-header', 'Missing authorization header'));
             }
-
-            next();
         } catch (err) {
             next(err)
         }

@@ -89,16 +89,6 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"Readonly_IInstance_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "IPromo": {
-        "dataType": "refObject",
-        "properties": {
-            "promo_id": {"dataType":"double","required":true},
-            "promo": {"dataType":"string","required":true},
-            "user_id": {"dataType":"double","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_IPromo.Exclude_keyofIPromo.promo_id__": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"user_id":{"dataType":"double","required":true},"promo":{"dataType":"string","required":true}},"validators":{}},
@@ -122,9 +112,19 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_IPromoCreate.Exclude_keyofIPromoCreate.user_id__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"promo":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_IPromoCreate.user_id_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Pick_IPromoCreate.Exclude_keyofIPromoCreate.user_id__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "IPromoUpdate": {
         "dataType": "refAlias",
-        "type": {"ref":"IPromoCreate","validators":{}},
+        "type": {"ref":"Omit_IPromoCreate.user_id_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "IUser": {
@@ -346,6 +346,8 @@ export function RegisterRoutes(app: express.Router) {
 
             function PromoController_getPromo(request: any, response: any, next: any) {
             const args = {
+                    page: {"in":"query","name":"page","required":true,"dataType":"double"},
+                    limit: {"in":"query","name":"limit","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

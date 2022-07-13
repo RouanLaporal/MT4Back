@@ -5,7 +5,7 @@ const PromoCreateSchema: JSONSchemaType<IPromoCreate> = {
     type: "object",
     properties: {
         promo: { type: "string", nullable: false },
-        user_id: { type: "number"}
+        user_id: { type: "number" }
     },
     required: ["promo"],
     additionalProperties: false
@@ -14,10 +14,9 @@ const PromoCreateSchema: JSONSchemaType<IPromoCreate> = {
 const PromoUpdateSchema: JSONSchemaType<IPromoUpdate> = {
     type: "object",
     properties: {
-        promo: { type: "string", nullable: true },
-        user_id: { type: "number"}
+        promo: { type: "string" },
     },
-    required: [],
+    required: ['promo'],
     additionalProperties: false
 };
 

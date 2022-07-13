@@ -11,5 +11,5 @@ export interface IPromo {
 }
 
 export type IPromoCreate = Omit<IPromo, 'promo_id'>;
-export type IPromoUpdate = IPromoCreate;
+export type IPromoUpdate = Omit<IPromoCreate, 'user_id'>;
 export type IPromoRO = Readonly<IPromo>;

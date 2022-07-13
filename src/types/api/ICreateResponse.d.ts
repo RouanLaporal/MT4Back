@@ -1,3 +1,3 @@
 export interface ICreateResponse {
-  id: number;
+  token: string;
 }

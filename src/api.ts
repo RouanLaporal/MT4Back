@@ -1,9 +1,9 @@
 import Express, { json } from "express";
-import { ROUTES_USER } from './routes/auth/user';
+// import { ROUTES_USER } from './routes/auth/user';
 import { DefaultErrorHandler } from './middleware/error-handler';
-import { ROUTES_CHALLENGE } from './routes/challenge';
+// import { ROUTES_CHALLENGE } from './routes/challenge';
 import { ROUTES_VALIDATION } from "./routes/validation";
-import { ROUTES_PROMO } from './routes/promo';
+// import { ROUTES_PROMO } from './routes/promo';
 import { RegisterRoutes } from './routes/routes';
 //import { ROUTES_SSH } from './routes/auth/ssh';
 
@@ -50,15 +50,15 @@ app.use(
   })
 );
 
-app.use('/auth/user', ROUTES_USER);
+// app.use('/auth/user', ROUTES_USER);
 
 //app.use('/auth/ssh', ROUTES_SSH)
 
-app.use('/challenge', ROUTES_CHALLENGE);
+// app.use('/challenge', ROUTES_CHALLENGE);
 
 app.use('/validation', ROUTES_VALIDATION);
 
-app.use('/promo', ROUTES_PROMO);
+// app.use('/promo', ROUTES_PROMO);
 
 // Ajouter un handler pour les erreurs
 app.use(DefaultErrorHandler);

@@ -8,11 +8,11 @@ const UserCreateSchema: JSONSchemaType<IUserCreate> = {
   properties: {
     first_name: { type: 'string', nullable: true },
     last_name: { type: 'string', nullable: true },
-    role_id: { type: 'number', nullable: true },
+    role_id: { type: 'number' },
     email: { type: 'string' },
     avatar: { type: 'string', nullable: true },
-    password: { type: 'string', nullable: true },
-    is_valid: { type: 'boolean' }
+    password: { type: 'string' },
+    is_valid: { type: 'boolean', nullable: true }
   },
   required: ["email"],
   additionalProperties: false,

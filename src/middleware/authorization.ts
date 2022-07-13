@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-var jwt = require('jsonwebtoken');
+import { ApiError } from '../classes/Errors/ApiError';
+import { ErrorCode } from '../classes/Errors/ErrorCode';
+
+const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 
@@ -19,8 +22,9 @@ export const authorization = (userTypes: 'professor' | 'student' | 'admin') => {
                 const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
                 response.locals = decodedToken;
             } else {
-                throw new Error("Not authorized")
+                throw new ApiError(ErrorCode.Unauthorized, 'auth/missing-header', 'Missing authorization header');
             }
+
             next();
         } catch (err) {
             next(err)

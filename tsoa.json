@@ -9,7 +9,8 @@
       "jwt": {
         "type": "apiKey",
         "name": "jwt",
-        "in": "header",
+        "in": "authorization-header",
+        "authenticationScheme": "Bearer",
         "authorizationUrl": "http://swagger.io/api/oauth/dialog"
       }
     }

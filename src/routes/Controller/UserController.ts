@@ -1,11 +1,20 @@
-import { Body, Delete, Get, Middlewares, Path, Post, Put, Query, Route, Security, Tags } from 'tsoa';
+import { Body, Delete, Get, Middlewares, Path, Post, Put, Query, Response, Route, Security, Tags, UploadedFile, SuccessResponse, Controller } from 'tsoa';
 import { Crud } from '../../classes/Crud';
-import { TestMiddleware } from '../../middleware/test-middleware';
+import { User } from '../../classes/User';
 import { ICreateResponse } from '../../types/api/ICreateResponse';
 import { IIndexResponse } from '../../types/api/IIndexQuery';
 import { IUpdateResponse } from '../../types/api/IUpdateResponse';
-import { IUser, IUserCreate, IUserUpdate } from '../../types/tables/user/IUser';
+import { IUser, IUserCreate, IUserUpdate, IUserRO } from '../../types/tables/user/IUser';
 import { IChangePasswordUpdate } from '../../types/api/IChangePassword';
+import { response, request } from 'express';
+import { IValidationCreate } from '../../types/tables/validation/IValidation';
+import { expressAuthentication } from '../auth/authentication';
+import { validationPassword, validationEmail } from '../../middleware/validForm';
+import { authorization } from '../../middleware/authorization';
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
+
+
 
 const READ_COLUMNS = ['user_id', 'email', 'first_name', 'last_name', 'password', 'avatar', 'is_valid', 'role_id'];
 
@@ -13,32 +22,85 @@ const READ_COLUMNS = ['user_id', 'email', 'first_name', 'last_name', 'password',
  * Un utilisateur de la plateforme.
  */
 @Route("/auth/user")
-@Security('jwt')
-@Middlewares(TestMiddleware)      // Exemple de l'ajout de middleware avant les sous-routes
 @Tags('User')
-export class UserController {
+export class UserController extends Controller {
 
   /**
    * Récupérer une page d'utilisateurs.
    */
+  @Security('jwt')
   @Get()
   public async getUsers(
     /** La page (zéro-index) à récupérer */
     @Query() page?: string,
     /** Le nombre d'éléments à récupérer (max 50) */
-    @Query() limit?: string,    
-  ): Promise<IIndexResponse<IUser>> {    
+    @Query() limit?: string,
+  ): Promise<IIndexResponse<IUser>> {
     return Crud.Index<IUser>({ page, limit }, 'USERS', READ_COLUMNS);
   }
 
   /**
    * Créer un nouvel utilisateur
    */
+  @Middlewares(validationPassword())
+  @Middlewares(validationEmail())
+  @SuccessResponse("201", "Created") // Custom success response
   @Post()
   public async createUser(
-    @Body() body: IUserCreate
+    @Body() body: Omit<IUserCreate, 'role_id'>,
   ): Promise<ICreateResponse> {
-    return Crud.Create<IUserCreate>(body, 'USERS');
+    this.setStatus(200); // set return status 201
+    return new User().register(body);
+  }
+  @Middlewares(authorization('professor'))
+  @Post('/verification-code')
+  public async verificationCode(
+    @Body() body: IValidationCreate,
+
+  ): Promise<any> {
+    this.setStatus(200); // set return status 201
+    return new User().verificationCode(body.code, body.user_id);
+  }
+
+
+  /**
+   * Changement du mot de passe oublié d'un utilisateur 
+   * @param email 
+   * 
+   */
+  @Middlewares(validationEmail())
+  @Post('/forget-password')
+  public async forgetPassword(
+    @Body() body: IUserUpdate
+  ): Promise<any> {
+    return new User().forgetPassword(body);
+  }
+
+  /**
+  * Réinitialisation du mot de passe d'un utilisateur avec son id
+  * 
+  * @param id 
+  * @param body 
+  * 
+  */
+  @Middlewares(validationPassword())
+  @Post('/reset-password/{id}')
+  public async resetPassword(
+    @Path() id: number,
+    @Body() body: IUserUpdate
+  ): Promise<any> {
+    return new User().resetPassword(body, id);
+  }
+  /**
+   *Authentifie un utilisateur
+   */
+  @Middlewares(validationPassword())
+  @Middlewares(validationEmail())
+  @Post('/login')
+  public async Login(
+    @Body() body: IUserUpdate
+  ): Promise<any> {
+    return new User().Login(body)
   }
 
   /**
@@ -72,32 +134,7 @@ export class UserController {
     return Crud.Delete('USERS', 'user_id', user_id);
   }
 
-  /**
-   * Changement du mot de passe oublié d'un utilisateur 
-   * @param email 
-   * 
-   */
-  @Post('/forget-password')
-  public async forgetPassword(
-    @Query() email: string
-  ): Promise<string> {
-    return 'success';
-  }
 
-  /**
-   * Réinitialisation du mot de passe d'un utilisateur avec son id
-   * 
-   * @param id 
-   * @param body 
-   * 
-   */
-  @Post('/reset-password/{id}')
-  public async resetPassword(
-    @Path() id: number,
-    @Body() body:IUserUpdate
-  ): Promise<string> {
-    return 'Success';
-  }
 
   @Put('change-password')
   public async changePassword(

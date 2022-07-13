@@ -5,7 +5,7 @@ const ValidationCreateSchema: JSONSchemaType<IValidationCreate> = {
     type: "object",
     properties: {
         code: { type: 'number' },
-        user_id: { type: 'number' }
+        user_id: { type: 'number' },
     },
     required: ["code"],
     additionalProperties: false

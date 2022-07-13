@@ -1,6 +1,5 @@
 import { Body, BodyProp, Delete, Get, Middlewares, Path, Post, Put, Query, Route, Security, Tags, UploadedFile } from 'tsoa';
 import { Crud } from '../../classes/Crud';
-import { TestMiddleware } from '../../middleware/test-middleware';
 import { ICreateResponse } from '../../types/api/ICreateResponse';
 import { IIndexResponse } from '../../types/api/IIndexQuery';
 import { IUpdateResponse } from '../../types/api/IUpdateResponse';
@@ -14,8 +13,7 @@ const READ_COLUMNS = ['challenge_id', 'challenge', 'is_active', 'user_id', 'prom
  * Un challenge de la plateforme.
  */
 @Route("/challenge")
-@Security('jwt')
-@Middlewares(TestMiddleware)      // Exemple de l'ajout de middleware avant les sous-routes
+// @Security('jwt')
 @Tags('Challenge')
 export class ChallengeController {
 
@@ -25,10 +23,10 @@ export class ChallengeController {
   @Get()
   public async getChallengesByUser(
     /** La page (zéro-index) à récupérer */
-    @Query() page?: string,    
+    @Query() page?: string,
     /** Le nombre d'éléments à récupérer (max 50) */
-    @Query() limit?: string,    
-  ): Promise<IIndexResponse<IChallenge>> {    
+    @Query() limit?: string,
+  ): Promise<IIndexResponse<IChallenge>> {
     return Crud.Index<IChallenge>({ page, limit }, 'CHALLENGES', READ_COLUMNS);
   }
 

@@ -1,6 +1,5 @@
 import { Body, BodyProp, Delete, Get, Middlewares, Path, Post, Put, Query, Route, Security, Tags, UploadedFile } from 'tsoa';
 import { Crud } from '../../classes/Crud';
-import { TestMiddleware } from '../../middleware/test-middleware';
 import { ICreateResponse } from '../../types/api/ICreateResponse';
 import { IIndexResponse } from '../../types/api/IIndexQuery';
 import { IUpdateResponse } from '../../types/api/IUpdateResponse';
@@ -12,8 +11,7 @@ const READ_COLUMNS = ['promo_id', 'promo', 'user_id'];
  * Une promo de la plateforme.
  */
 @Route("/promo")
-@Security('jwt')
-@Middlewares(TestMiddleware)      // Exemple de l'ajout de middleware avant les sous-routes
+// @Security('jwt')
 @Tags('Promo')
 export class PromoController {
 
@@ -22,8 +20,8 @@ export class PromoController {
    * 
    */
   @Get()
-  public async getPromo( 
-  ): Promise<IPromo[]> {    
+  public async getPromo(
+  ): Promise<IPromo[]> {
     return [];
   }
 

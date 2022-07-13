@@ -1,0 +1,1214 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"IChallenge": {
+				"description": "Les différents challenges",
+				"properties": {
+					"challenge_id": {
+						"type": "number",
+						"format": "double",
+						"description": "ID du challenge"
+					},
+					"challenge": {
+						"type": "string",
+						"description": "nom du challenge"
+					},
+					"is_active": {
+						"type": "boolean",
+						"description": "Status du challenge || true or false"
+					},
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"promo_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"url": {
+						"type": "string",
+						"description": "url du challenge"
+					}
+				},
+				"required": [
+					"challenge_id",
+					"challenge",
+					"is_active",
+					"user_id",
+					"promo_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IIndexResponse_IChallenge_": {
+				"description": "La structure d'une réponse à une requête Index.",
+				"properties": {
+					"page": {
+						"type": "number",
+						"format": "double",
+						"description": "Le numéro de la page demandée"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double",
+						"description": "Le nombre de lignes demandée"
+					},
+					"total": {
+						"type": "number",
+						"format": "double",
+						"description": "Le nombre total de lignes dans la table"
+					},
+					"rows": {
+						"items": {
+							"$ref": "#/components/schemas/IChallenge"
+						},
+						"type": "array",
+						"description": "Les lignes"
+					}
+				},
+				"required": [
+					"page",
+					"limit",
+					"total",
+					"rows"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_IChallenge.Exclude_keyofIChallenge.challenge_id__": {
+				"properties": {
+					"challenge": {
+						"type": "string",
+						"description": "nom du challenge"
+					},
+					"is_active": {
+						"type": "boolean",
+						"description": "Status du challenge || true or false"
+					},
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"promo_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"url": {
+						"type": "string",
+						"description": "url du challenge"
+					}
+				},
+				"required": [
+					"challenge",
+					"is_active",
+					"user_id",
+					"promo_id"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_IChallenge.challenge_id_": {
+				"$ref": "#/components/schemas/Pick_IChallenge.Exclude_keyofIChallenge.challenge_id__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"IChallengeCreate": {
+				"$ref": "#/components/schemas/Omit_IChallenge.challenge_id_"
+			},
+			"Readonly_IInstance_": {
+				"properties": {
+					"address_ip": {
+						"type": "string",
+						"description": "ID Unique"
+					},
+					"user_name": {
+						"type": "string",
+						"description": "Nom d'utilisateur"
+					},
+					"db_password": {
+						"type": "string",
+						"description": "Mot de passe de la base de données"
+					},
+					"db_port": {
+						"type": "number",
+						"format": "double",
+						"description": "Port de la base de données"
+					},
+					"first_name": {
+						"type": "string",
+						"description": "Prénom de l'utilisateur"
+					},
+					"last_name": {
+						"type": "string",
+						"description": "Prénom de l'utilisateur"
+					}
+				},
+				"required": [
+					"address_ip",
+					"user_name",
+					"db_password",
+					"db_port",
+					"first_name",
+					"last_name"
+				],
+				"type": "object",
+				"description": "Make all properties in T readonly"
+			},
+			"IInstanceRO": {
+				"$ref": "#/components/schemas/Readonly_IInstance_"
+			},
+			"Pick_IPromo.Exclude_keyofIPromo.promo_id__": {
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double",
+						"description": "ID utilisateur associé à une promo"
+					},
+					"promo": {
+						"type": "string",
+						"description": "nom de la promotion"
+					}
+				},
+				"required": [
+					"user_id",
+					"promo"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_IPromo.promo_id_": {
+				"$ref": "#/components/schemas/Pick_IPromo.Exclude_keyofIPromo.promo_id__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"IPromoCreate": {
+				"$ref": "#/components/schemas/Omit_IPromo.promo_id_"
+			},
+			"IUpdateResponse": {
+				"properties": {
+					"rows": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"rows"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_IPromoCreate.Exclude_keyofIPromoCreate.user_id__": {
+				"properties": {
+					"promo": {
+						"type": "string",
+						"description": "nom de la promotion"
+					}
+				},
+				"required": [
+					"promo"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_IPromoCreate.user_id_": {
+				"$ref": "#/components/schemas/Pick_IPromoCreate.Exclude_keyofIPromoCreate.user_id__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"IPromoUpdate": {
+				"$ref": "#/components/schemas/Omit_IPromoCreate.user_id_"
+			},
+			"IUser": {
+				"description": "Un utilisateur de la plateforme.",
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double",
+						"description": "ID Unique"
+					},
+					"first_name": {
+						"type": "string",
+						"description": "Nom de famille"
+					},
+					"last_name": {
+						"type": "string",
+						"description": "Prénom"
+					},
+					"role_id": {
+						"type": "number",
+						"format": "double",
+						"description": "1 = professor || 2 = student"
+					},
+					"email": {
+						"type": "string",
+						"description": "Adresse-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur"
+					},
+					"avatar": {
+						"type": "string",
+						"description": "Avatar de l'utilisateur"
+					},
+					"password": {
+						"type": "string",
+						"description": "Mot de passe de l'utilisateur"
+					},
+					"is_valid": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"user_id",
+					"role_id",
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IIndexResponse_IUser_": {
+				"description": "La structure d'une réponse à une requête Index.",
+				"properties": {
+					"page": {
+						"type": "number",
+						"format": "double",
+						"description": "Le numéro de la page demandée"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double",
+						"description": "Le nombre de lignes demandée"
+					},
+					"total": {
+						"type": "number",
+						"format": "double",
+						"description": "Le nombre total de lignes dans la table"
+					},
+					"rows": {
+						"items": {
+							"$ref": "#/components/schemas/IUser"
+						},
+						"type": "array",
+						"description": "Les lignes"
+					}
+				},
+				"required": [
+					"page",
+					"limit",
+					"total",
+					"rows"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ICreateResponse": {
+				"properties": {
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_IUserCreate.Exclude_keyofIUserCreate.role_id__": {
+				"properties": {
+					"first_name": {
+						"type": "string",
+						"description": "Nom de famille"
+					},
+					"last_name": {
+						"type": "string",
+						"description": "Prénom"
+					},
+					"email": {
+						"type": "string",
+						"description": "Adresse-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur"
+					},
+					"avatar": {
+						"type": "string",
+						"description": "Avatar de l'utilisateur"
+					},
+					"password": {
+						"type": "string",
+						"description": "Mot de passe de l'utilisateur"
+					},
+					"is_valid": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_IUserCreate.role_id_": {
+				"$ref": "#/components/schemas/Pick_IUserCreate.Exclude_keyofIUserCreate.role_id__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"IValidation": {
+				"properties": {
+					"code": {
+						"type": "number",
+						"format": "double",
+						"description": "Code de validation"
+					},
+					"user_id": {
+						"type": "number",
+						"format": "double",
+						"description": "ID de l'utilisateur associé à la validation"
+					}
+				},
+				"required": [
+					"code",
+					"user_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IValidationCreate": {
+				"$ref": "#/components/schemas/IValidation"
+			},
+			"Partial_IUserCreate_": {
+				"properties": {
+					"first_name": {
+						"type": "string",
+						"description": "Nom de famille"
+					},
+					"last_name": {
+						"type": "string",
+						"description": "Prénom"
+					},
+					"role_id": {
+						"type": "number",
+						"format": "double",
+						"description": "1 = professor || 2 = student"
+					},
+					"email": {
+						"type": "string",
+						"description": "Adresse-mail, ceci doit être unique est sera utilisé comme identifiant pour l'utilisateur"
+					},
+					"avatar": {
+						"type": "string",
+						"description": "Avatar de l'utilisateur"
+					},
+					"password": {
+						"type": "string",
+						"description": "Mot de passe de l'utilisateur"
+					},
+					"is_valid": {
+						"type": "boolean"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"IUserUpdate": {
+				"$ref": "#/components/schemas/Partial_IUserCreate_"
+			},
+			"IChangePassword": {
+				"description": "Changement de mot de passe d'un utilisateur.",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "email de l'utilisateur"
+					},
+					"oldPassword": {
+						"type": "string",
+						"description": "Ancien mot de passe d'un utilisateur"
+					},
+					"newPassword": {
+						"type": "string",
+						"description": "Ancien mot de passe d'un utilisateur"
+					}
+				},
+				"required": [
+					"email",
+					"oldPassword",
+					"newPassword"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IChangePasswordUpdate": {
+				"$ref": "#/components/schemas/IChangePassword"
+			}
+		},
+		"securitySchemes": {
+			"jwt": {
+				"type": "apiKey",
+				"name": "jwt",
+				"in": "authorization-header",
+				"authenticationScheme": "Bearer",
+				"authorizationUrl": "http://swagger.io/api/oauth/dialog"
+			}
+		}
+	},
+	"info": {
+		"title": "projet-manhattan",
+		"version": "1.0.0",
+		"description": "Manhattan api project with nodejs",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/challenge": {
+			"get": {
+				"operationId": "GetChallenges",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IIndexResponse_IChallenge_"
+								}
+							}
+						}
+					}
+				},
+				"description": "Récupérer une page de challenge.",
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "La page (zéro-index) à récupérer",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Le nombre d'éléments à récupérer (max 50)",
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateChallenge",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Créer un nouveau challenge",
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IChallengeCreate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/challenge/{user_id}": {
+			"get": {
+				"operationId": "GetChallengesByUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "La page (zéro-index) à récupérer",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "Le nombre d'éléments à récupérer (max 50)",
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/challenge/evaluation/authentification/{token}": {
+			"post": {
+				"operationId": "SignUpToChallenge",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Inscription d'un étudiant à un challenge",
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {}
+						}
+					}
+				}
+			}
+		},
+		"/challenge/connection/test": {
+			"post": {
+				"operationId": "TestInstanceConnection",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {}
+						}
+					}
+				}
+			}
+		},
+		"/challenge/disable/{challenge_id}": {
+			"put": {
+				"operationId": "DesactivateChallenge",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "number",
+									"format": "double"
+								}
+							}
+						}
+					}
+				},
+				"description": "Désactivation d'un challenge par id de challenge",
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "challenge_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/challenge/auth/run-challenge/{token}": {
+			"post": {
+				"operationId": "LaunchChallenge",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Vérification de données pour un utilisateur",
+				"tags": [
+					"Challenge"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IInstanceRO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/promo": {
+			"get": {
+				"operationId": "GetPromo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Récupérer une page de promo.",
+				"tags": [
+					"Promo"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreatePromo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Créer une nouvelle promo",
+				"tags": [
+					"Promo"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IPromoCreate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/promo/{id}": {
+			"put": {
+				"operationId": "UpdatePromo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IUpdateResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Mettre à jour une promo",
+				"tags": [
+					"Promo"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IPromoUpdate"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeletePromo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IUpdateResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Supprimer une promo",
+				"tags": [
+					"Promo"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/auth/user": {
+			"get": {
+				"operationId": "GetUsers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IIndexResponse_IUser_"
+								}
+							}
+						}
+					}
+				},
+				"description": "Récupérer une page d'utilisateurs.",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "La page (zéro-index) à récupérer",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Le nombre d'éléments à récupérer (max 50)",
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateUser",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ICreateResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Créer un nouvel utilisateur",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Omit_IUserCreate.role_id_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/user/verification-code": {
+			"post": {
+				"operationId": "VerificationCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IValidationCreate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/user/forget-password": {
+			"post": {
+				"operationId": "ForgetPassword",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Changement du mot de passe oublié d'un utilisateur",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IUserUpdate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/user/reset-password/{id}": {
+			"post": {
+				"operationId": "ResetPassword",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Réinitialisation du mot de passe d'un utilisateur avec son id",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IUserUpdate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/user/login": {
+			"post": {
+				"operationId": "Login",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Authentifie un utilisateur",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IUserUpdate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/user/change-password": {
+			"put": {
+				"operationId": "ChangePassword",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "request body from user",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IChangePasswordUpdate",
+								"description": "request body from user"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/user/{user_id}": {
+			"get": {
+				"operationId": "ReadUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IUser"
+								}
+							}
+						}
+					}
+				},
+				"description": "Récupérer un utilisateur avec l'ID passé dans l'URL",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IUpdateResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Mettre à jour un utilisateur avec le ID passé dans le URL",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IUserUpdate"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IUpdateResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Supprimer un utilisateur",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
